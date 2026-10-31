@@ -68,7 +68,7 @@ Las formas de taladro (`Worm Bore Shape`, `Wheel Bore Shape`) se eligen en una l
 
 Además, el grupo **Resultado** tiene tres propiedades de solo lectura:
 - `Center Distance`: la distancia entre ejes;
-- `Summary`: el resumen (relación, distancia entre ejes, ángulo de hélice y autobloqueo, diámetros);
+- `Summary`: el resumen (relación, distancia entre ejes, ángulo de hélice, rendimiento estimado y autobloqueo, diámetros);
 - `Warnings`: los avisos, los mismos que en el diálogo de Fusion. También salen en la vista de informe.
 
 Con un error (por ejemplo, una rueda demasiado ancha para el sinfín) el objeto queda marcado en rojo y no se genera.

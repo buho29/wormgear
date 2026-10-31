@@ -53,6 +53,9 @@ DIN6885 = [(8, 2, 1.0), (10, 3, 1.4), (12, 4, 1.8), (17, 5, 2.3), (22, 6, 2.8), 
 FIT = 0.1               # holgura de impresión que se añade al chavetero (mm)
 CHAMFER_BELOW_ROOT = 0.3   # los chaflanes del sinfín empiezan 0.3 mm por debajo del fondo del filete (mm)
 CHAMFER_TOP = 0.5          # y suben hasta 0.5 mm por encima de la cresta (mm)
+# rozamiento entre flancos de plástico impreso (PLA, PETG): con grasa y en seco
+MU_GREASED = 0.1
+MU_DRY = 0.3
 
 
 def derive(prm):
@@ -76,6 +79,8 @@ def derive(prm):
     q['rim'] = q['r_tip2'] + q['rim_over_tip']
     q['R_OUT'] = q['rim'] + 1.0
     q['lead_angle_deg'] = math.degrees(math.atan(q['lead'] / (math.pi * q['worm_pitch_d'])))
+    # ángulo de presión normal: el flanco es recto en la sección axial, tan αn = tan αx · cos λ
+    q['alpha_n'] = math.atan(math.tan(q['alpha']) * math.cos(math.radians(q['lead_angle_deg'])))
     q['hand'] = -1 if q['left_handed'] else 1
     # sinfín: filete en |x| <= thread_half; fuera, tramos lisos de radio r_shoulder
     L = q['worm_length'] / 2
@@ -126,6 +131,23 @@ def tooth_depth(q, z):
 def hw(q, r, extra=0.0):
     """Semiancho axial del filete a radio r (extra = engorde de cada flanco)."""
     return q['p'] / 4 + extra - (r - q['R1']) * math.tan(q['alpha'])
+
+
+def efficiency(q, mu):
+    """Rendimiento con rozamiento mu: (el sinfín mueve la rueda, la rueda mueve el sinfín).
+
+    El segundo es ≤ 0 si la rueda no puede mover el sinfín (autobloqueo): tan λ ≤ mu / cos αn.
+    Con más ángulo de flanco, cos αn baja y el rozamiento pesa más: 45° rinde menos que 20°, pero
+    se autobloquea con más hélice.
+    """
+    t = math.tan(math.radians(q['lead_angle_deg']))
+    c = math.cos(q['alpha_n'])
+    return (c - mu * t) / (c + mu / t), (c - mu / t) / (c + mu * t)
+
+
+def locking_limit_deg(q, mu):
+    """Ángulo de hélice hasta el que la rueda no puede mover el sinfín con rozamiento mu."""
+    return math.degrees(math.atan(mu / math.cos(q['alpha_n'])))
 
 
 def rim_radius(q, z):
@@ -401,11 +423,21 @@ def check_params(prm):
             errors.append(str(e))
     if land is not None and land < 0.3:
         warns.append('Los dientes de la rueda quedan en punta en el borde (%.2f mm): baja "borde sobre la cabeza".' % land)
-    locking = 'autobloqueante' if q['lead_angle_deg'] < 5.5 else ('casi autobloqueante' if q['lead_angle_deg'] < 8 else 'reversible')
-    summary = ('Relación %g:1 (%d dientes / %d entradas) · entre ejes %.2f mm · avance %.3f mm · hélice %.2f° a %s (%s)\n'
+    eta_g, eta_d = efficiency(q, MU_GREASED)[0], efficiency(q, MU_DRY)[0]
+    lim_g, lim_d = locking_limit_deg(q, MU_GREASED), locking_limit_deg(q, MU_DRY)
+    if q['lead_angle_deg'] <= lim_g:
+        locking = 'autobloqueante: la rueda no mueve el sinfín ni con grasa (con grasa lo es hasta %.1f° de hélice)' % lim_g
+    elif q['lead_angle_deg'] <= lim_d:
+        locking = ('puede bloquearse en seco, pero con grasa la rueda mueve el sinfín (con grasa se bloquea hasta %.1f° '
+                   'de hélice)' % lim_g)
+    else:
+        locking = 'reversible: la rueda mueve el sinfín (en seco se bloquea hasta %.1f° de hélice)' % lim_d
+    summary = ('Relación %g:1 (%d dientes / %d entradas) · entre ejes %.2f mm · avance %.3f mm · hélice %.2f° a %s\n'
+               'Rendimiento %.0f %% con grasa (μ %.1f) y %.0f %% en seco (μ %.1f) · %s\n'
                'Sinfín Ø%.2f / fondo Ø%.2f · rueda Ø%.2f primitivo, borde Ø%.2f · cresta del sinfín %.2f mm%s'
                % (round(q['teeth'] / q['starts'], 3), q['teeth'], q['starts'], q['A'], q['lead'], q['lead_angle_deg'],
-                  'izquierdas' if q['hand'] < 0 else 'derechas', locking,
+                  'izquierdas' if q['hand'] < 0 else 'derechas',
+                  100 * eta_g, MU_GREASED, 100 * eta_d, MU_DRY, locking,
                   2 * q['r_tip'], 2 * q['r_root'], 2 * q['R2'], 2 * q['rim'], crest,
                   '' if land is None else ' · cabeza del diente de la rueda %.2f mm' % land))
     if partial:
@@ -436,6 +468,13 @@ if __name__ == '__main__':
         ll, rl, _, _ = gap_profile(ql, c)
         assert all(math.isclose(a[0], -b[0]) and math.isclose(a[1], b[1]) for a, b in zip(ll + rl, rr_ + lr))
     print('a izquierdas: hueco simétrico, bien')
+    # rendimiento: el autobloqueo tiene que coincidir con el rendimiento hacia atrás ≤ 0
+    q20 = derive(dict(flank_deg=20))
+    for q_ in (derive({}), q20, derive(dict(starts=2)), derive(dict(starts=3))):
+        for mu in (0.05, MU_GREASED, MU_DRY):
+            assert (efficiency(q_, mu)[1] <= 0) == (q_['lead_angle_deg'] <= locking_limit_deg(q_, mu))
+    print('rendimiento con μ 0.05 (acero con aceite): %.0f %% con 20° de flanco, %.0f %% con 45°'
+          % (100 * efficiency(q20, 0.05)[0], 100 * efficiency(derive({}), 0.05)[0]))
     for shape, size, flat in (('hex', 5.6, 0), ('square', 5, 0), ('d', 5.1, 4.6), ('keyway', 8.1, 0)):
         print('taladro %s %.1f: radio máx. %.2f, %d tramos' % (shape, size, bore_radius(shape, size, flat),
                                                               len(bore_outline(shape, size, flat))))

@@ -52,7 +52,8 @@ Los parámetros y sus valores por defecto están en la [portada](../README.md#-p
 El cuadro *Resumen* se actualiza mientras se teclea. Muestra:
 - la relación de transmisión;
 - la distancia entre ejes;
-- el ángulo de hélice, y si el sinfín se autobloquea;
+- el ángulo de hélice;
+- el rendimiento estimado, con grasa y en seco, y si el sinfín se autobloquea;
 - los diámetros;
 - los avisos: cresta del sinfín muy fina, garganta de más de 45°, voladizos, socavado, dientes en punta y poco cubo.
 
@@ -96,6 +97,6 @@ Al terminar, el resultado sale en un mensaje. Este es el del juego de las imáge
 - `wormgear/build.py`: crea la geometría en el diseño activo.
 - `wormgear/check.py`: comprueba interferencias y juego.
 - `resources/`: los iconos.
-- `img/`: las imágenes de este README. El GIF se hizo desde el MCP de Fusion: los cuerpos y sus aristas se copian como gráficos personalizados (mallas y líneas), se giran con la relación y se guarda un fotograma por posición. Se giran los vértices, no la transformación del gráfico: así la caja envolvente no crece y el suelo, con su sombra, no se mueve. Los diagramas del cálculo están en el [`img/`](../img/) de la raíz.
+- `img/`: las imágenes de este README. Los GIF se hicieron desde el MCP de Fusion: los cuerpos y sus aristas se copian como gráficos personalizados (mallas y líneas), se giran con la relación y se guarda un fotograma por posición. Se giran los vértices, no la transformación del gráfico: así la caja envolvente no crece y el suelo, con su sombra, no se mueve. En `seccion.gif`, el corte es una intersección con una caja en cada fotograma, con cuerpos temporales. Los diagramas del cálculo están en el [`img/`](../img/) de la raíz.
 - `install.ps1`: registra esta carpeta en la lista de complementos de Fusion.
 - `installer/`: `instalar.bat`, `desinstalar.bat` y `LEEME.txt`, que van en el zip, y `make_release.ps1`, que lo genera.

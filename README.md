@@ -69,7 +69,7 @@ Los taladros:
 
 Los **tramos lisos** van a los dos lados del filete, que queda centrado. Si son más finos que el núcleo, el escalón es de 45°. El filete tiene que cubrir toda la zona en la que entra la rueda: si es más corto, da error y dice el mínimo.
 
-Con los valores puestos, las dos versiones muestran la relación de transmisión, la distancia entre ejes, el ángulo de hélice (con la mano y si el sinfín se autobloquea), los diámetros y los avisos.
+Con los valores puestos, las dos versiones muestran la relación de transmisión, la distancia entre ejes, el ángulo de hélice con la mano, los diámetros y los avisos. También estiman el **rendimiento** con grasa (μ 0.1) y en seco (μ 0.3), y dicen si la rueda puede mover el sinfín (**autobloqueo**: tan λ ≤ μ / cos αn, con αn el ángulo de presión normal). Con 45° de flanco, el rendimiento es algo menor que con 20°, pero se autobloquea con más hélice ([más](comparativa.md#rendimiento-con-flanco-de-45)). Son estimaciones: el rozamiento del plástico varía mucho, y con vibraciones un sinfín autobloqueante puede volver atrás.
 
 ## 🔍 Comprobación del engrane
 
@@ -109,6 +109,10 @@ Los diagramas son del juego por defecto (m1.5, 30 dientes, 1 entrada, flanco de 
 **2. En cada plano, el sinfín es una cremallera.** Al girar, el filete del sinfín, que es un helicoide, solo se desplaza a lo largo de su eje sin salir del plano. La rueda gira alrededor de Z, así que el plano tampoco se mueve. Por eso lo que pasa en cada plano es un engrane 2D de cremallera y piñón, y su envolvente es la del engrane 3D real, también lejos del centro.
 
 ![Sección del sinfín en dos planos](img/calc_2_seccion.png)
+
+Así se ve en el plano medio de un juego generado (30:1), cortado en Fusion mientras gira:
+
+<p align="center"><img src="fusion/img/seccion.gif" alt="Corte por el plano medio de la rueda mientras engrana" width="480"></p>
 
 **3. El hueco del diente es lo que barre el sinfín.** Si miras desde la rueda, como si estuviera quieta, el sinfín pasa rodando por delante. El hueco del diente es la envolvente de todas sus posiciones: la forma justa para que el filete entre sin tocar.
 
@@ -157,6 +161,7 @@ Lo que de verdad lo respalda no es una cita, sino la comprobación con los cuerp
 | [`freecad/`](freecad/README.md) | El banco de trabajo de FreeCAD: código, pruebas y su README. |
 | `img/` | Los diagramas del cálculo. `img/diagramas.py` los dibuja con matplotlib a partir de `fusion/wormgear/geometry.py`. |
 | `package.xml` | Los metadatos para el gestor de complementos de FreeCAD. |
+| [`comparativa.md`](comparativa.md) | Qué hacen otros generadores de sinfín y rueda (Fusion, FreeCAD, Onshape, Inventor, OpenSCAD). |
 
 ## 📄 Licencia
 
