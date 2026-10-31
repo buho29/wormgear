@@ -1,5 +1,5 @@
 ﻿# Genera dist\WormGear-<versión>.zip para instalar el add-in sin el repo.
-# El zip lleva instalar.bat, desinstalar.bat, LEEME.txt y la carpeta WormGear con solo lo que necesita Fusion.
+# El zip lleva instalar.bat, desinstalar.bat, LEEME.txt y la carpeta WormGear con solo lo que necesita Fusion (y la licencia).
 # Uso:  powershell -ExecutionPolicy Bypass -File installer\make_release.ps1
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
@@ -13,7 +13,7 @@ New-Item -ItemType Directory -Force (Join-Path $stage 'WormGear\wormgear') | Out
 New-Item -ItemType Directory -Force (Join-Path $stage 'WormGear\resources') | Out-Null
 
 # Lo que carga Fusion (sin settings.json, __pycache__, install.ps1 ni este instalador)
-Copy-Item (Join-Path $root 'WormGear.manifest'), (Join-Path $root 'WormGear.py'), (Join-Path $root 'README.md') (Join-Path $stage 'WormGear')
+Copy-Item (Join-Path $root 'WormGear.manifest'), (Join-Path $root 'WormGear.py'), (Join-Path $root 'README.md'), (Join-Path $root '..\LICENSE') (Join-Path $stage 'WormGear')
 Copy-Item (Join-Path $root 'wormgear\*.py') (Join-Path $stage 'WormGear\wormgear')
 Copy-Item (Join-Path $root 'resources\*.png') (Join-Path $stage 'WormGear\resources')
 Copy-Item (Join-Path $PSScriptRoot 'instalar.bat'), (Join-Path $PSScriptRoot 'desinstalar.bat'), (Join-Path $PSScriptRoot 'LEEME.txt') $stage

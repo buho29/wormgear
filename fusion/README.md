@@ -4,6 +4,8 @@ Genera un tornillo sin fin y su rueda dentada, paramétricos y pensados para imp
 
 Está en **SÓLIDO > CREAR > Sinfín y rueda** (diseños de pieza e híbridos) y en **ENSAMBLAJE > CREAR** (diseños de ensamblaje).
 
+Hay una versión para FreeCAD con la misma matemática: [freecad/](../freecad/README.md).
+
 ![Sinfín y rueda girando](img/engrane.gif)
 
 Las imágenes son de un juego generado con el add-in: módulo 1.5, 60 dientes, sinfín de 3 entradas (relación 20:1) y flanco de 30°. En la animación, una vuelta del sinfín hace girar la rueda 3 dientes.
@@ -16,7 +18,7 @@ Las imágenes son de un juego generado con el add-in: módulo 1.5, 60 dientes, s
 
 ### Sin el repo (zip)
 
-1. Descarga `WormGear-<versión>.zip` de las [Releases](https://github.com/buho29/smart-sentry/releases) y descomprímelo entero.
+1. Descarga `WormGear-<versión>.zip` de las [Releases](https://github.com/buho29/wormgear/releases) y descomprímelo entero.
 2. Haz doble clic en `instalar.bat`. Copia la carpeta `WormGear` en la carpeta de complementos de Fusion y no pide permisos de administrador.
 3. En Fusion: **Utilidades > Complementos** (Mayús+S) > *WormGear* > **Ejecutar**, y marca *Al iniciar*.
 
@@ -26,13 +28,13 @@ En Mac, copia a mano la carpeta `WormGear` del zip a `~/Library/Application Supp
 
 **Para sacar una versión nueva:**
 1. Sube `version` en `WormGear.manifest`.
-2. Ejecuta `powershell -ExecutionPolicy Bypass -File installer\make_release.ps1`. Deja el zip en `dist/`, que no va en git.
+2. Ejecuta `powershell -ExecutionPolicy Bypass -File fusion\installer\make_release.ps1`. Deja el zip en `dist/`, que no va en git.
 3. Sube el zip a una Release de GitHub.
 
 ### Con el repo (desarrollo)
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File 3D\fusion-addins\WormGear\install.ps1
+powershell -ExecutionPolicy Bypass -File fusion\install.ps1
 ```
 
 El script crea un enlace (junction) desde `%APPDATA%\Autodesk\Autodesk Fusion 360\API\AddIns\WormGear` hasta esta carpeta. Fusion carga directamente lo que hay en el repo.

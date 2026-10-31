@@ -30,4 +30,4 @@ Copia la carpeta WormGear a
 Más información
 ---------------
 WormGear/README.md, o el repositorio:
-https://github.com/buho29/smart-sentry/tree/main/3D/fusion-addins/WormGear
+https://github.com/buho29/wormgear

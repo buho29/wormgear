@@ -1,5 +1,5 @@
 ﻿# Enlaza esta carpeta del repo en la carpeta de complementos de Fusion 360 (junction: no hace falta ser administrador).
-# Uso:  powershell -ExecutionPolicy Bypass -File install.ps1
+# Uso:  powershell -ExecutionPolicy Bypass -File fusion\install.ps1
 $addins = Join-Path $env:APPDATA 'Autodesk\Autodesk Fusion 360\API\AddIns'
 $link = Join-Path $addins 'WormGear'
 $target = $PSScriptRoot
