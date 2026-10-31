@@ -6,7 +6,7 @@
   "description": {
     "": "Parametric worm and worm wheel: the wheel is a loft of computed envelope profiles (smooth teeth, no interference). / Sinfín y rueda paramétricos: la rueda se hace con perfiles de envolvente calculados y una solevación (dientes lisos, sin interferencias)."
   },
-  "version": "1.2.0",
+  "version": "1.2.1",
   "runOnStartup": true,
   "supportedOS": "windows|mac",
   "editEnabled": true
