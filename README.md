@@ -73,7 +73,15 @@ En Fusion, los tres juegos (los valores por defecto; m2, 2 entradas y 30°; y m1
 
 ## 🧮 Cómo se calcula la rueda
 
-La rueda no se dibuja a ojo, ni se mecaniza con cientos de restas, que dejarían cientos de caras por diente. Se calcula así.
+La rueda no se dibuja a ojo, ni se mecaniza con cientos de restas.
+
+El primer intento fue mecanizarla: restar el sinfín del disco en muchas posiciones, girando los dos con la relación, como haría una fresa madre. Funciona, pero cada resta deja su propia faceta: el diente sale con cientos de caras finas (las rayas de la izquierda), el modelo pesa mucho y los flancos quedan escalonados. Con la envolvente calculada, el mismo diente sale con unas 6 caras lisas (derecha).
+
+| Primer intento: restas | Ahora: envolvente y solevación |
+|---|---|
+| ![Dientes mecanizados con restas](img/primer_intento_restas.png) | ![Dientes lisos de la solevación](fusion/img/dientes.jpg) |
+
+Se calcula así.
 
 Los diagramas son del juego por defecto (m1.5, 30 dientes, 1 entrada, flanco de 45°) y salen de la misma matemática: `python img/diagramas.py`.
 
