@@ -1,5 +1,7 @@
 # Sinfín y rueda (add-in de Fusion 360)
 
+**Español** · [English](README.en.md)
+
 Genera un tornillo sin fin y su rueda dentada, paramétricos y pensados para imprimir sin soportes.
 
 Está en **SÓLIDO > CREAR > Sinfín y rueda** (diseños de pieza e híbridos) y en **ENSAMBLAJE > CREAR** (diseños de ensamblaje).
@@ -59,6 +61,8 @@ El cuadro *Resumen* se actualiza mientras se teclea. Muestra:
 
 Con un error no deja generar.
 
+El diálogo, el resumen, los mensajes y los nombres de la línea de tiempo salen en castellano si Fusion está en castellano, y en inglés con cualquier otro idioma (**Preferencias > General > Idioma**; Fusion pide reiniciar).
+
 Los últimos valores se guardan en `settings.json`, que no va en git.
 
 ## Qué crea
@@ -94,9 +98,10 @@ Al terminar, el resultado sale en un mensaje. Este es el del juego de las imáge
 
 - `WormGear.py`: el add-in (botón, diálogo y eventos).
 - `wormgear/geometry.py`: la matemática. No depende de Fusion: `python -X utf8 wormgear/geometry.py` imprime un resumen de prueba.
+- `wormgear/i18n.py`: los textos en inglés. `python -X utf8 wormgear/i18n.py` comprueba que no falta ninguno.
 - `wormgear/build.py`: crea la geometría en el diseño activo.
 - `wormgear/check.py`: comprueba interferencias y juego.
 - `resources/`: los iconos.
 - `img/`: las imágenes de este README. Los GIF se hicieron desde el MCP de Fusion: los cuerpos y sus aristas se copian como gráficos personalizados (mallas y líneas), se giran con la relación y se guarda un fotograma por posición. Se giran los vértices, no la transformación del gráfico: así la caja envolvente no crece y el suelo, con su sombra, no se mueve. En `seccion.gif`, el corte es una intersección con una caja en cada fotograma, con cuerpos temporales. Los diagramas del cálculo están en el [`img/`](../img/) de la raíz.
 - `install.ps1`: registra esta carpeta en la lista de complementos de Fusion.
-- `installer/`: `instalar.bat`, `desinstalar.bat` y `LEEME.txt`, que van en el zip, y `make_release.ps1`, que lo genera.
+- `installer/`: `instalar.bat`, `desinstalar.bat`, `LEEME.txt` y `README.txt` (en inglés), que van en el zip, y `make_release.ps1`, que lo genera.

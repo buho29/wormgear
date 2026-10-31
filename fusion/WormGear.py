@@ -12,12 +12,14 @@ import adsk.fusion
 HERE = os.path.dirname(os.path.abspath(__file__))
 if HERE not in sys.path:
     sys.path.insert(0, HERE)
+import wormgear.i18n  # noqa: E402
 import wormgear.geometry  # noqa: E402
 import wormgear.build  # noqa: E402
 import wormgear.check  # noqa: E402
-for _m in (wormgear.geometry, wormgear.build, wormgear.check):   # recargar al reiniciar el add-in
+for _m in (wormgear.i18n, wormgear.geometry, wormgear.build, wormgear.check):   # recargar al reiniciar el add-in
     importlib.reload(_m)
 from wormgear import geometry as G, build as B, check as C  # noqa: E402
+from wormgear.i18n import tr, set_language  # noqa: E402
 
 CMD_ID = 'cupulaWormGear'
 # SÓLIDO > CREAR (diseños de pieza e híbridos) y ENSAMBLAJE > CREAR (diseños de ensamblaje)
@@ -29,7 +31,7 @@ _ui = _app.userInterface
 _handlers = []
 _state = {}   # comando abierto y última validación (útil para depurar)
 
-# (id del grupo, título, [(parámetro, etiqueta, tipo, mín, máx, paso)])
+# (id del grupo, título, [(parámetro, etiqueta, tipo, mín, máx, paso)]); los textos pasan por tr() al usarlos
 #   tipos: len = mm, ang = grados, int = entero, float = número sin unidades, bool = casilla,
 #   bore = forma de taladro (lista de geometry.BORE_SHAPES)
 FIELDS = [
@@ -92,7 +94,7 @@ def _read(inputs):
             inp = inputs.itemById(key)
             if kind in ('len', 'ang'):
                 if not inp.isValidExpression:
-                    bad.append(label)
+                    bad.append(tr(label))
                     continue
                 prm[key] = inp.value * 10.0 if kind == 'len' else inp.value * 180.0 / 3.141592653589793
             elif kind == 'bore':
@@ -111,13 +113,13 @@ def _evaluate(inputs):
     """(html del resumen, ¿se puede generar?). El resumen explica siempre por qué no se puede."""
     prm, bad = _read(inputs)
     if bad:
-        return ('<b><font color="#d33">✖ No entiendo el valor de: %s.</font></b><br>'
-                'Escribe un número con punto decimal y, si quieres, la unidad (p. ej. <i>1.5 mm</i>, <i>45 deg</i>).'
+        return (tr('<b><font color="#d33">✖ No entiendo el valor de: %s.</font></b><br>'
+                   'Escribe un número con punto decimal y, si quieres, la unidad (p. ej. <i>1.5 mm</i>, <i>45 deg</i>).')
                 % ', '.join(bad)), False
     try:
         q, errors, warns, summary = G.check_params(prm)
     except Exception as e:   # combinación que la matemática no sabe tratar
-        return '<b><font color="#d33">✖ Con estos valores no sale geometría: %s</font></b>' % e, False
+        return tr('<b><font color="#d33">✖ Con estos valores no sale geometría: %s</font></b>') % e, False
     html = summary.replace('\n', '<br>')
     for e in errors:
         html += '<br><b><font color="#d33">✖ %s</font></b>' % e
@@ -131,16 +133,16 @@ class _CreatedHandler(adsk.core.CommandCreatedEventHandler):
         try:
             cmd = args.command
             _state['cmd'] = cmd
-            cmd.okButtonText = 'Generar'
+            cmd.okButtonText = tr('Generar')
             cmd.setDialogMinimumSize(420, 600)
             inputs = cmd.commandInputs
             s = _load_settings()
             for gid, title, fields in FIELDS:
-                grp = inputs.addGroupCommandInput(gid, title)
+                grp = inputs.addGroupCommandInput(gid, tr(title))
                 grp.isExpanded = True
                 gi = grp.children
                 for f in fields:
-                    key, label, kind = f[0], f[1], f[2]
+                    key, label, kind = f[0], tr(f[1]), f[2]
                     v = s.get(key, G.DEFAULTS[key])
                     if kind == 'len':
                         gi.addValueInput(key, label, 'mm', adsk.core.ValueInput.createByString('%g mm' % v))
@@ -153,15 +155,15 @@ class _CreatedHandler(adsk.core.CommandCreatedEventHandler):
                     elif kind == 'bore':
                         dd = gi.addDropDownCommandInput(key, label, adsk.core.DropDownStyles.TextListDropDownStyle)
                         for k, text in G.BORE_SHAPES:
-                            dd.listItems.add(text, k == v)
+                            dd.listItems.add(tr(text), k == v)
                     else:
                         gi.addFloatSpinnerCommandInput(key, label, '', f[3], f[4], f[5], float(v))
-            opt = inputs.addGroupCommandInput('g_opt', 'Opciones').children
-            dd = opt.addDropDownCommandInput('what', 'Generar', adsk.core.DropDownStyles.TextListDropDownStyle)
+            opt = inputs.addGroupCommandInput('g_opt', tr('Opciones')).children
+            dd = opt.addDropDownCommandInput('what', tr('Generar'), adsk.core.DropDownStyles.TextListDropDownStyle)
             for key, label in WHAT:
-                dd.listItems.add(label, key == s.get('what', 'both'))
-            opt.addBoolValueInput('check', 'Comprobar engrane al terminar', True, '', bool(s.get('check', True)))
-            inputs.addTextBoxCommandInput('info', 'Resumen', _evaluate(inputs)[0], 12, True)
+                dd.listItems.add(tr(label), key == s.get('what', 'both'))
+            opt.addBoolValueInput('check', tr('Comprobar engrane al terminar'), True, '', bool(s.get('check', True)))
+            inputs.addTextBoxCommandInput('info', tr('Resumen'), _evaluate(inputs)[0], 12, True)
             _update_visibility(inputs)
 
             for ev, h in ((cmd.execute, _ExecuteHandler()), (cmd.inputChanged, _ChangedHandler()),
@@ -169,7 +171,7 @@ class _CreatedHandler(adsk.core.CommandCreatedEventHandler):
                 ev.add(h)
                 _handlers.append(h)
         except Exception:
-            _ui.messageBox('Sinfín y rueda: error al abrir el diálogo\n' + traceback.format_exc())
+            _ui.messageBox(tr('Sinfín y rueda: error al abrir el diálogo') + '\n' + traceback.format_exc())
 
 
 def _update_visibility(inputs):
@@ -190,7 +192,7 @@ def _refresh(inputs):
     try:
         html, valid = _evaluate(inputs)
     except Exception:
-        html, valid = ('<b><font color="#d33">✖ Error interno del complemento:</font></b><br>%s'
+        html, valid = (tr('<b><font color="#d33">✖ Error interno del complemento:</font></b><br>%s')
                        % traceback.format_exc().replace('\n', '<br>')), False
     info = inputs.itemById('info')
     if info and info.formattedText != html:
@@ -220,7 +222,7 @@ class _ExecuteHandler(adsk.core.CommandEventHandler):
             design = adsk.fusion.Design.cast(_app.activeProduct)
             if not design:
                 args.executeFailed = True
-                args.executeFailedMessage = 'Abre un diseño (espacio de trabajo DISEÑO) antes de usar Sinfín y rueda.'
+                args.executeFailedMessage = tr('Abre un diseño (espacio de trabajo DISEÑO) antes de usar Sinfín y rueda.')
                 return
             prm, _ = _read(inputs)
             what = WHAT[inputs.itemById('what').selectedItem.index][0]
@@ -235,26 +237,36 @@ class _ExecuteHandler(adsk.core.CommandEventHandler):
                 msg.append(txt)
             _, _, warns, summary = G.check_params(prm)
             _ui.messageBox('\n'.join([summary, ''] + msg + ([''] + ['⚠ ' + w for w in warns] if warns else [])),
-                           'Sinfín y rueda')
+                           tr('Sinfín y rueda'))
         except ValueError as e:   # parámetros que no dan geometría: mensaje claro, sin traza
             args.executeFailed = True
-            args.executeFailedMessage = 'No se pudo generar: %s' % e
-            _ui.messageBox('No se pudo generar:\n%s' % e, 'Sinfín y rueda')
+            args.executeFailedMessage = tr('No se pudo generar: %s') % e
+            _ui.messageBox(tr('No se pudo generar: %s') % ('\n%s' % e), tr('Sinfín y rueda'))
         except Exception as e:
             args.executeFailed = True
-            args.executeFailedMessage = 'No se pudo generar: %s' % e
-            _ui.messageBox('Sinfín y rueda: error\n' + traceback.format_exc())
+            args.executeFailedMessage = tr('No se pudo generar: %s') % e
+            _ui.messageBox(tr('Sinfín y rueda: error') + '\n' + traceback.format_exc())
+
+
+def _language():
+    """'es' si Fusion está en castellano; si no, 'en'."""
+    try:
+        spanish = _app.preferences.generalPreferences.userLanguage == adsk.core.UserLanguages.SpanishLanguage
+    except Exception:
+        spanish = False
+    return 'es' if spanish else 'en'
 
 
 def run(context):
     try:
+        set_language(_language())
         cmd_def = _ui.commandDefinitions.itemById(CMD_ID)
         if cmd_def:
             cmd_def.deleteMe()
         cmd_def = _ui.commandDefinitions.addButtonDefinition(
-            CMD_ID, 'Sinfín y rueda',
-            'Sinfín y su rueda dentada, paramétricos e imprimibles. La rueda se genera con perfiles '
-            'de envolvente calculados y una solevación (dientes lisos, sin interferencias).',
+            CMD_ID, tr('Sinfín y rueda'),
+            tr('Sinfín y su rueda dentada, paramétricos e imprimibles. La rueda se genera con perfiles '
+               'de envolvente calculados y una solevación (dientes lisos, sin interferencias).'),
             os.path.join(HERE, 'resources'))
         h = _CreatedHandler()
         cmd_def.commandCreated.add(h)
@@ -264,7 +276,7 @@ def run(context):
             if panel and not panel.controls.itemById(CMD_ID):
                 panel.controls.addCommand(cmd_def)
     except Exception:
-        _ui.messageBox('Sinfín y rueda: error al arrancar\n' + traceback.format_exc())
+        _ui.messageBox(tr('Sinfín y rueda: error al arrancar') + '\n' + traceback.format_exc())
 
 
 def stop(context):
@@ -279,4 +291,4 @@ def stop(context):
             cmd_def.deleteMe()
         _handlers.clear()
     except Exception:
-        _ui.messageBox('Sinfín y rueda: error al parar\n' + traceback.format_exc())
+        _ui.messageBox(tr('Sinfín y rueda: error al parar') + '\n' + traceback.format_exc())

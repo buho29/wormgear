@@ -2,7 +2,7 @@
 # Genera el sinfín y la rueda con cuatro juegos de parámetros y comprueba que:
 # - los dos sólidos son válidos y la rueda sale con unas 6 caras por diente;
 # - no hay interferencia en 8 fases de un diente y el juego medido es la holgura pedida;
-# - geometry.py es idéntico al del add-in de Fusion.
+# - geometry.py e i18n.py son idénticos a los del add-in de Fusion, y todos los textos tienen traducción.
 # Si existe la variable WORMGEAR_OUT, deja ahí el STL de cada pieza.
 import filecmp
 import os
@@ -16,7 +16,7 @@ if os.path.join(ROOT, 'freecad') not in freecad.__path__:
     freecad.__path__.append(os.path.join(ROOT, 'freecad'))
 
 import MeshPart  # noqa: E402
-from freecad.wormgear import geometry as G, shapes as S, check as C  # noqa: E402
+from freecad.wormgear import geometry as G, shapes as S, check as C, i18n  # noqa: E402
 
 CASES = [
     ('por defecto', {}),
@@ -32,9 +32,11 @@ CASES = [
 
 def main():
     failures = []
-    fusion_geometry = os.path.join(ROOT, '..', 'fusion', 'wormgear', 'geometry.py')
-    if os.path.exists(fusion_geometry) and not filecmp.cmp(fusion_geometry, os.path.join(ROOT, 'freecad', 'wormgear', 'geometry.py'), False):
-        failures.append('geometry.py no es igual que el del add-in de Fusion: cópialo.')
+    for f in ('geometry.py', 'i18n.py'):
+        fusion_copy = os.path.join(ROOT, '..', 'fusion', 'wormgear', f)
+        if os.path.exists(fusion_copy) and not filecmp.cmp(fusion_copy, os.path.join(ROOT, 'freecad', 'wormgear', f), False):
+            failures.append('%s no es igual que el del add-in de Fusion: cópialo.' % f)
+    failures += i18n.problems()
     out = os.environ.get('WORMGEAR_OUT')
     for i, (name, prm) in enumerate(CASES, 1):
         t = time.time()

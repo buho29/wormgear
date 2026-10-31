@@ -7,6 +7,7 @@ import adsk.core
 import adsk.fusion
 
 from .build import MM, P, V, worm_axis_rotation, wheel_rotation
+from .i18n import tr
 
 TOL = 1e-4   # mm³: por debajo se considera que no tocan
 
@@ -74,11 +75,11 @@ def check(q, worm_body, wheel_body, phases=8):
 
 def report(res, q):
     ok = res['max_overlap'] <= TOL
-    lines = ['Interferencia en %d fases de un diente: %s (máx. %.4f mm³)'
-             % (len(res['overlaps']), 'ninguna' if ok else 'SÍ', res['max_overlap'])]
+    lines = [tr('Interferencia en %d fases de un diente: %s (máx. %.4f mm³)')
+             % (len(res['overlaps']), tr('ninguna') if ok else tr('SÍ'), res['max_overlap'])]
     if res['play_mm'] is None:
-        lines.append('Juego: no he encontrado contacto girando el sinfín (¿demasiada holgura?).')
+        lines.append(tr('Juego: no he encontrado contacto girando el sinfín (¿demasiada holgura?).'))
     else:
-        lines.append('Juego: el sinfín gira +%.2f° / -%.2f° hasta tocar = %.3f mm axiales (pedido %.3f mm)'
+        lines.append(tr('Juego: el sinfín gira +%.2f° / -%.2f° hasta tocar = %.3f mm axiales (pedido %.3f mm)')
                      % (res['play_pos_deg'], res['play_neg_deg'], res['play_mm'], q['backlash']))
     return ok, '\n'.join(lines)

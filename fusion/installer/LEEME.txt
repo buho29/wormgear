@@ -29,5 +29,5 @@ Copia la carpeta WormGear a
 
 Más información
 ---------------
-WormGear/README.md, o el repositorio:
+WormGear/README.md (en inglés, README.en.md), o el repositorio:
 https://github.com/buho29/wormgear

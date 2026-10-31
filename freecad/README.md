@@ -1,5 +1,7 @@
 # Sinfín y rueda (banco de trabajo de FreeCAD)
 
+**Español** · [English](README.en.md)
+
 Genera un tornillo sin fin y su rueda dentada lisa, paramétricos y pensados para imprimir sin soportes. Es la versión para FreeCAD de [WormGear](../README.md): usa la misma matemática que el [add-in de Fusion](../fusion/README.md) y da el mismo resultado.
 
 El módulo de engranajes de FreeCAD (FCGear) solo hace el sinfín: la rueda hay que dibujarla a mano. Aquí sale también la rueda, con los dientes tallados por la envolvente exacta del sinfín.
@@ -62,7 +64,7 @@ La rueda tarda unos 15 segundos en generarse (30 dientes). Si solo cambias la lo
 
 Los parámetros son los mismos que en Fusion. Están, con sus valores por defecto y el nombre de cada propiedad, en la [portada](../README.md#-parámetros).
 
-Los nombres de las propiedades van en inglés porque son identificadores de FreeCAD. Al pasar el ratón por encima sale la descripción en castellano.
+Los nombres de las propiedades van en inglés porque son identificadores de FreeCAD. Los grupos, la descripción que sale al pasar el ratón por encima, los botones, los avisos y los nombres de las piezas van en castellano si FreeCAD está en castellano (**Editar > Preferencias > General > Idioma**, o el del sistema), y en inglés con cualquier otro idioma. Un documento guardado en otro idioma se adapta al abrirlo, sin recalcular.
 
 Las formas de taladro (`Worm Bore Shape`, `Wheel Bore Shape`) se eligen en una lista. Los documentos hechos con la versión anterior se abren bien: al abrirlos se añaden las propiedades nuevas con su valor por defecto.
 
@@ -81,7 +83,7 @@ La rueda se calcula igual que en el add-in de Fusion. Está explicado, con diagr
 3. Con una fórmula cerrada sale el perfil del hueco del diente (`geometry.gap_profile`).
 4. Una solevación une los perfiles, y el hueco se repite y se resta del disco.
 
-`freecad/wormgear/geometry.py` es una copia exacta del de Fusion. Si se cambia, hay que cambiar los dos: las pruebas avisan si no son iguales.
+`freecad/wormgear/geometry.py` es una copia exacta del de Fusion, igual que `i18n.py` (los textos en inglés). Si se cambia uno, hay que cambiar los dos: las pruebas avisan si no son iguales y si falta alguna traducción.
 
 Lo que cambia es la construcción, que en FreeCAD se hace con OCCT:
 - **El sinfín** es una sola sección transversal (núcleo y filetes) extruida en hélice, como hace FCGear, en vez del barrido del perfil axial que se usa en Fusion. Es el mismo sinfín: un flanco recto en la sección axial es una espiral de Arquímedes en la transversal.
@@ -110,6 +112,7 @@ Genera y comprueba cuatro juegos (unos 12 minutos en total), uno de ellos a izqu
 - `freecad/wormgear/shapes.py`: crea los sólidos con Part. No necesita la interfaz.
 - `freecad/wormgear/check.py`: comprueba interferencias y juego.
 - `freecad/wormgear/geometry.py`: la matemática, copia de la del add-in de Fusion.
+- `freecad/wormgear/i18n.py`: los textos en inglés, copia del de Fusion.
 - `freecad/wormgear/resources/`: los iconos.
 - `tests/run_tests.py`: las pruebas sin interfaz.
 - `install.ps1`: crea el enlace en la carpeta `Mod`.

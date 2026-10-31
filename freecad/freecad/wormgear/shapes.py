@@ -13,6 +13,7 @@ import FreeCAD as App
 import Part
 
 from . import geometry as G
+from .i18n import tr
 
 V = App.Vector
 
@@ -127,16 +128,16 @@ def worm_shape(q):
     prism = _bore_prism(G.bores(q)[0], -L - 1, L + 1)
     if prism is not None:
         bore_area = _bore_face(G.bores(q)[0]).Area
-        worm = _single_solid(worm.cut(prism), 'El sinfín')
+        worm = _single_solid(worm.cut(prism), tr('El sinfín'))
     # los booleanos de OCCT a veces fallan sin avisar y devuelven uno de los dos sólidos: se mira el volumen
     v_min = (math.pi * min(r for _, r in outline) ** 2 - bore_area) * 2 * L
     v_max = keep.Volume - bore_area * 2 * L
     if not v_min < worm.Volume < v_max:
-        raise RuntimeError('El sinfín ha salido mal (volumen %.0f mm³, tendría que estar entre %.0f y %.0f): '
-                           'prueba a cambiar un poco la longitud.' % (worm.Volume, v_min, v_max))
+        raise RuntimeError(tr('El sinfín ha salido mal (volumen %.0f mm³, tendría que estar entre %.0f y %.0f): '
+                              'prueba a cambiar un poco la longitud.') % (worm.Volume, v_min, v_max))
     worm.transformShape(_worm_to_world(q), True)   # con copia: la geometría queda en el mundo, sin Placement
     if q['hand'] < 0:
-        worm = _single_solid(worm.mirror(V(0, 0, 0), V(1, 0, 0)), 'El sinfín')   # el eje está en x = 0
+        worm = _single_solid(worm.mirror(V(0, 0, 0), V(1, 0, 0)), tr('El sinfín'))   # el eje está en x = 0
     return worm
 
 
@@ -182,7 +183,7 @@ def gap_solid(q):
     wires = [_gap_wire(q, c) for c in q['section_z']]
     gap = Part.makeLoft(wires, True, False, False, 5)
     if not gap.isValid() or gap.Volume <= 0:
-        raise RuntimeError('La solevación del hueco del diente no ha salido válida.')
+        raise RuntimeError(tr('La solevación del hueco del diente no ha salido válida.'))
     return gap
 
 
@@ -194,10 +195,10 @@ def wheel_shape(q):
         g = gap.copy()
         g.rotate(V(0, 0, 0), V(0, 0, 1), 360.0 * k / q['teeth'])
         gaps.append(g)
-    wheel = _single_solid(blank.cut(Part.makeCompound(gaps)), 'La rueda')
+    wheel = _single_solid(blank.cut(Part.makeCompound(gaps)), tr('La rueda'))
     if len(wheel.Faces) < 3 * q['teeth'] or wheel.Volume > 0.999 * blank.Volume:
-        raise RuntimeError('No se han tallado bien los dientes de la rueda (%d caras): prueba a cambiar un poco '
-                           'el ancho o el número de perfiles.' % len(wheel.Faces))
+        raise RuntimeError(tr('No se han tallado bien los dientes de la rueda (%d caras): prueba a cambiar un poco '
+                              'el ancho o el número de perfiles.') % len(wheel.Faces))
     return wheel
 
 
@@ -205,10 +206,10 @@ def _single_solid(shape, name):
     """Un único sólido válido (los booleanos de OCCT devuelven un compound)."""
     solids = shape.Solids
     if len(solids) != 1:
-        raise RuntimeError('%s ha salido en %d sólidos.' % (name, len(solids)))
+        raise RuntimeError(tr('%s ha salido en %d sólidos.') % (name, len(solids)))
     s = solids[0]
     if not s.isValid():
         s.fix(1e-7, 1e-7, 1e-7)
         if not s.isValid():
-            raise RuntimeError('%s no es un sólido válido.' % name)
+            raise RuntimeError(tr('%s no es un sólido válido.') % name)
     return s

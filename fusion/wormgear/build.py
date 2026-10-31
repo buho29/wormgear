@@ -12,6 +12,7 @@ import adsk.core
 import adsk.fusion
 
 from . import geometry as G
+from .i18n import tr
 
 MM = 0.1   # Fusion trabaja en cm
 
@@ -125,7 +126,7 @@ def _cut_bore(comp, body, outline, plane, to_model, length, name):
     if not outline:
         return body
     sk = comp.sketches.add(plane)
-    sk.name = 'Taladro ' + name
+    sk.name = name
 
     def sp(uv):
         return sk.modelToSketchSpace(P(*to_model(*uv)))
@@ -138,28 +139,28 @@ def _cut_bore(comp, body, outline, plane, to_model, length, name):
             sk.sketchCurves.sketchArcs.addByThreePoints(sp(item[1]), sp(item[2]), sp(item[3]))
     sk.isVisible = False
     if sk.profiles.count != 1:
-        raise RuntimeError('El contorno del taladro de %s no ha salido cerrado (%d perfiles).' % (name, sk.profiles.count))
+        raise RuntimeError(tr('El contorno de "%s" no ha salido cerrado (%d perfiles).') % (name, sk.profiles.count))
     ei = comp.features.extrudeFeatures.createInput(sk.profiles.item(0), adsk.fusion.FeatureOperations.CutFeatureOperation)
     ei.setSymmetricExtent(adsk.core.ValueInput.createByReal(length * MM), True)
     ei.participantBodies = [body]
     ext = comp.features.extrudeFeatures.add(ei)
-    ext.name = 'Taladro ' + name
+    ext.name = name
     return ext.bodies.item(0) if ext.bodies.count else body
 
 
 def build_worm(comp, q, log):
     tb = worm_solid(comp, q)
     bf = comp.features.baseFeatures.add()
-    bf.name = 'Sinfín'
+    bf.name = tr('Sinfín')
     bf.startEdit()
     comp.bRepBodies.add(tb, bf)
     bf.finishEdit()
     body = bf.bodies.item(0)
     # taladro a lo largo del eje (X por y = A): boceto en el plano YZ, con u -> y, v -> z
     body = _cut_bore(comp, body, G.bores(q)[0], comp.yZConstructionPlane, lambda u, v: (0.0, q['A'] + u, v),
-                     q['worm_length'] + 2, 'sinfín')
-    body.name = 'Sinfín'
-    log.append('Sinfín: %d caras, %.0f mm³' % (body.faces.count, body.volume * 1000))
+                     q['worm_length'] + 2, tr('Taladro del sinfín'))
+    body.name = tr('Sinfín')
+    log.append(tr('Sinfín: %d caras, %.0f mm³') % (body.faces.count, body.volume * 1000))
     return body
 
 
@@ -181,7 +182,7 @@ def build_wheel(comp, q, log):
             tbm.booleanOperation(keep, cone, adsk.fusion.BooleanTypes.UnionBooleanType)
         tbm.booleanOperation(blank, keep, adsk.fusion.BooleanTypes.IntersectionBooleanType)
     bf = comp.features.baseFeatures.add()
-    bf.name = 'Rueda en bruto'
+    bf.name = tr('Rueda en bruto')
     bf.startEdit()
     comp.bRepBodies.add(blank, bf)
     bf.finishEdit()
@@ -195,7 +196,7 @@ def build_wheel(comp, q, log):
         pl = comp.constructionPlanes.add(pin)
         pl.isLightBulbOn = False
         sk = comp.sketches.add(pl)
-        sk.name = 'Hueco z=%+.2f' % c
+        sk.name = tr('Hueco z=%+.2f') % c
         sk.isComputeDeferred = True
         left, right, rr, ro = G.gap_profile(q, c)
 
@@ -218,7 +219,7 @@ def build_wheel(comp, q, log):
         sk.isComputeDeferred = False
         sk.isVisible = False
         if sk.profiles.count != 1:
-            raise RuntimeError('El perfil del hueco en z=%.2f no ha salido cerrado (%d perfiles).' % (c, sk.profiles.count))
+            raise RuntimeError(tr('El perfil del hueco en z=%.2f no ha salido cerrado (%d perfiles).') % (c, sk.profiles.count))
         sketches.append(sk)
 
     li = comp.features.loftFeatures.createInput(adsk.fusion.FeatureOperations.NewBodyFeatureOperation)
@@ -226,7 +227,7 @@ def build_wheel(comp, q, log):
         li.loftSections.add(sk.profiles.item(0))
     li.isSolid = True
     loft = comp.features.loftFeatures.add(li)
-    loft.name = 'Hueco del diente'
+    loft.name = tr('Hueco del diente')
     cutter = loft.bodies.item(0)
 
     oc = adsk.core.ObjectCollection.create()
@@ -235,7 +236,7 @@ def build_wheel(comp, q, log):
     pin.quantity = adsk.core.ValueInput.createByReal(q['teeth'])
     pin.totalAngle = adsk.core.ValueInput.createByString('360 deg')
     pat = comp.features.circularPatternFeatures.add(pin)
-    pat.name = 'Huecos'
+    pat.name = tr('Huecos')
     tools = adsk.core.ObjectCollection.create()
     tools.add(cutter)
     for b in pat.bodies:
@@ -245,12 +246,12 @@ def build_wheel(comp, q, log):
     ci.operation = adsk.fusion.FeatureOperations.CutFeatureOperation
     ci.isKeepToolBodies = False
     cut = comp.features.combineFeatures.add(ci)
-    cut.name = 'Tallar rueda'
+    cut.name = tr('Tallar rueda')
     body = cut.bodies.item(0)
     body = _cut_bore(comp, body, G.bores(q)[1], comp.xYConstructionPlane, lambda u, v: (u, v, 0.0),
-                     q['wheel_width'] + 2, 'rueda')
-    body.name = 'Rueda'
-    log.append('Rueda: %d caras (%.1f por diente), %.0f mm³' % (body.faces.count, body.faces.count / q['teeth'], body.volume * 1000))
+                     q['wheel_width'] + 2, tr('Taladro de la rueda'))
+    body.name = tr('Rueda')
+    log.append(tr('Rueda: %d caras (%.1f por diente), %.0f mm³') % (body.faces.count, body.faces.count / q['teeth'], body.volume * 1000))
     return body
 
 
@@ -259,7 +260,7 @@ def build_wheel(comp, q, log):
 def _axis_line(comp, which, q):
     """Línea de boceto sobre el eje de la rueda ('wheel', +Z) o del sinfín ('worm', +X por y = A)."""
     sk = comp.sketches.add(comp.xYConstructionPlane)
-    sk.name = 'Eje %s' % ('rueda' if which == 'wheel' else 'sinfín')
+    sk.name = tr('Eje rueda') if which == 'wheel' else tr('Eje sinfín')
     if which == 'wheel':
         h = q['wheel_width'] / 2
         ln = sk.sketchCurves.sketchLines.addByTwoPoints(P(0, 0, -h), P(0, 0, h))
@@ -275,11 +276,11 @@ def _joints(root, q, tag, parts, log):
     """Junta de giro de cada pieza respecto a un componente fijo "Ejes" (con las líneas de los dos ejes),
     y enlace de movimiento con la relación si están las dos. parts = {'worm': (occ, comp), 'wheel': (...)}."""
     occ_axes = root.occurrences.addNewComponent(adsk.core.Matrix3D.create())
-    occ_axes.component.name = 'Ejes %s' % tag
+    occ_axes.component.name = tr('Ejes %s') % tag
     occ_axes.isGrounded = True
     joints = {}
     for which, (occ, comp) in parts.items():
-        name = 'rueda' if which == 'wheel' else 'sinfín'
+        name = tr('rueda') if which == 'wheel' else tr('sinfín')
         # en los diseños híbridos/de ensamblaje un componente nuevo puede quedar "fijado al principal":
         # entonces la junta no lo mueve
         for attr, value in (('isGroundToParent', False), ('isGrounded', False)):
@@ -296,10 +297,10 @@ def _joints(root, q, tag, parts, log):
             # eje de giro explícito = la línea del eje (con X/Y/Z de la junta Fusion gira alrededor de otro eje)
             ji.setAsRevoluteJointMotion(adsk.fusion.JointDirections.CustomJointDirection, fixed)
             j = root.joints.add(ji)
-            j.name = 'Giro %s' % name
+            j.name = tr('Giro rueda') if which == 'wheel' else tr('Giro sinfín')
             joints[which] = j
         except Exception as e:
-            log.append('%s: no se pudo crear la junta de giro (%s).' % (name, str(e).splitlines()[0]))
+            log.append(tr('%s: no se pudo crear la junta de giro (%s).') % (name, str(e).splitlines()[0]))
     if len(joints) == 2:
         try:
             # una vuelta del sinfín (giro + alrededor de +X) = entradas/dientes de vuelta de la rueda (+ alrededor de +Z)
@@ -308,10 +309,10 @@ def _joints(root, q, tag, parts, log):
             mi.valueTwo = adsk.core.ValueInput.createByString('%.6f deg' % (360.0 * q['starts'] / q['teeth']))
             mi.isReversed = q['hand'] < 0   # a izquierdas la rueda gira al revés
             ml = root.motionLinks.add(mi)
-            ml.name = 'Sinfín %s' % tag
-            log.append('Juntas de giro y enlace de movimiento creados: arrastra el sinfín y gira la rueda.')
+            ml.name = tr('Sinfín %s') % tag
+            log.append(tr('Juntas de giro y enlace de movimiento creados: arrastra el sinfín y gira la rueda.'))
         except Exception as e:
-            log.append('No se pudo crear el enlace de movimiento (%s): créalo a mano, 360° del sinfín = %.4f° de la rueda.'
+            log.append(tr('No se pudo crear el enlace de movimiento (%s): créalo a mano, 360° del sinfín = %.4f° de la rueda.')
                        % (str(e).splitlines()[0], 360.0 * q['starts'] / q['teeth']))
     return joints
 
@@ -327,7 +328,7 @@ def build(design, prm, what='both'):
     root = design.rootComponent
     tl = design.timeline
     start = tl.count
-    tag = 'm%g %d:%d%s' % (q['module'], q['teeth'], q['starts'], ' izq' if q['hand'] < 0 else '')
+    tag = 'm%g %d:%d%s' % (q['module'], q['teeth'], q['starts'], tr(' izq') if q['hand'] < 0 else '')
 
     # los diseños "de pieza" no admiten componentes: ahí van como cuerpos del raíz.
     # Se mira antes de intentarlo, porque un addNewComponent fallido deja el error pendiente en la API.
@@ -335,16 +336,16 @@ def build(design, prm, what='both'):
     comp_worm = comp_wheel = root
     intent = getattr(design, 'designIntent', None)
     if intent == getattr(adsk.fusion.DesignIntentTypes, 'PartDesignIntentType', -1):
-        log.append('Diseño de pieza: sinfín y rueda van como cuerpos (sin componentes ni juntas).')
+        log.append(tr('Diseño de pieza: sinfín y rueda van como cuerpos (sin componentes ni juntas).'))
     else:
         if what in ('both', 'worm'):
             occ_worm = root.occurrences.addNewComponent(adsk.core.Matrix3D.create())
             comp_worm = occ_worm.component
-            comp_worm.name = 'Sinfín %s' % tag
+            comp_worm.name = tr('Sinfín %s') % tag
         if what in ('both', 'wheel'):
             occ_wheel = root.occurrences.addNewComponent(adsk.core.Matrix3D.create())
             comp_wheel = occ_wheel.component
-            comp_wheel.name = 'Rueda %s' % tag
+            comp_wheel.name = tr('Rueda %s') % tag
 
     worm = build_worm(comp_worm, q, log) if what in ('both', 'worm') else None
     wheel = build_wheel(comp_wheel, q, log) if what in ('both', 'wheel') else None
@@ -358,8 +359,8 @@ def build(design, prm, what='both'):
     try:
         if tl.count - 1 > start:
             grp = tl.timelineGroups.add(start, tl.count - 1)
-            grp.name = 'Sinfín y rueda %s' % tag
+            grp.name = tr('Sinfín y rueda %s') % tag
     except Exception as e:
-        log.append('No se pudo agrupar la línea de tiempo (%s).' % str(e).splitlines()[0])
+        log.append(tr('No se pudo agrupar la línea de tiempo (%s).') % str(e).splitlines()[0])
     build.last_joints = joints
     return q, worm, wheel, log

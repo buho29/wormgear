@@ -1,6 +1,8 @@
 # Otros generadores de sinfín y rueda
 
-Qué hacen los generadores de sinfín y rueda más conocidos de Fusion 360, FreeCAD, Onshape, Inventor y OpenSCAD, junto a WormGear (v1.1). Sirve para elegir el que mejor encaje con lo que necesitas.
+**Español** · [English](comparativa.en.md)
+
+Qué hacen los generadores de sinfín y rueda más conocidos de Fusion 360, FreeCAD, Onshape, Inventor y OpenSCAD, junto a WormGear (v1.2). Sirve para elegir el que mejor encaje con lo que necesitas.
 
 Los datos de los demás salen de su documentación o de su código, revisados el 31/10/2026; no los he ejecutado y pueden haber cambiado. "–" quiere decir que su documentación no lo menciona.
 

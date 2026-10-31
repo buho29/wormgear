@@ -7,6 +7,8 @@ import math
 import FreeCAD as App
 import Part
 
+from .i18n import tr
+
 V = App.Vector
 TOL = 1e-4   # mm³: por debajo se considera que no tocan
 BISECT = 10  # pasos de la bisección del juego (precisión ≈ 0.02°)
@@ -65,11 +67,11 @@ def check(q, worm_shape, wheel_shape, phases=8, progress=None):
 
 def report(res, q):
     ok = res['max_overlap'] <= TOL
-    lines = ['Interferencia en %d fases de un diente: %s (máx. %.4f mm³)'
-             % (len(res['overlaps']), 'ninguna' if ok else 'SÍ', res['max_overlap'])]
+    lines = [tr('Interferencia en %d fases de un diente: %s (máx. %.4f mm³)')
+             % (len(res['overlaps']), tr('ninguna') if ok else tr('SÍ'), res['max_overlap'])]
     if res['play_mm'] is None:
-        lines.append('Juego: no he encontrado contacto girando el sinfín (¿demasiada holgura?).')
+        lines.append(tr('Juego: no he encontrado contacto girando el sinfín (¿demasiada holgura?).'))
     else:
-        lines.append('Juego: el sinfín gira +%.2f° / -%.2f° hasta tocar = %.3f mm axiales (pedido %.3f mm)'
+        lines.append(tr('Juego: el sinfín gira +%.2f° / -%.2f° hasta tocar = %.3f mm axiales (pedido %.3f mm)')
                      % (res['play_pos_deg'], res['play_neg_deg'], res['play_mm'], q['backlash']))
     return ok, '\n'.join(lines)

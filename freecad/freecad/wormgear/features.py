@@ -3,12 +3,14 @@
 #   rueda). Va oculto: es el que se edita.
 # - WormGearPart ("Sinfín" / "Rueda"): cada pieza por separado, sacada del compound, para verla, moverla y
 #   exportar su STL.
-# Los nombres de las propiedades van en inglés (son identificadores) y la descripción, en castellano.
+# Los nombres de las propiedades van en inglés (son identificadores); los grupos, las descripciones y las
+# etiquetas, en el idioma de FreeCAD (i18n.tr).
 import os
 
 import FreeCAD as App
 
 from . import geometry as G
+from .i18n import tr, labels_of
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ICON = os.path.join(HERE, 'resources', '64x64.png')
@@ -49,9 +51,16 @@ PROPS = [
 # no cambian la rueda / no cambian el sinfín
 WORM_ONLY = ('worm_length', 'thread_length', 'shoulder_d', 'worm_bore_shape', 'worm_bore', 'worm_bore_flat')
 WHEEL_ONLY = ('wheel_width', 'wheel_bore_shape', 'wheel_bore', 'wheel_bore_flat', 'rim_over_tip', 'sections')
-# las enumeraciones guardan la etiqueta en castellano; geometry usa la clave
-BORE_LABEL = dict(G.BORE_SHAPES)
-BORE_KEY = {label: key for key, label in G.BORE_SHAPES}
+# las enumeraciones guardan la etiqueta en el idioma de la interfaz; geometry usa la clave.
+# BORE_KEY entiende las etiquetas de todos los idiomas: un documento guardado en otro idioma se abre bien.
+BORE_LABEL = {key: tr(label) for key, label in G.BORE_SHAPES}
+BORE_KEY = {text: key for key, label in G.BORE_SHAPES for text in labels_of(label)}
+# propiedades de resultado del WormGearPair y de cada pieza: (propiedad, grupo, descripción)
+RESULT_PROPS = [('Summary', 'Resultado', 'Relación, distancia entre ejes, diámetros…'),
+                ('Warnings', 'Resultado', 'Avisos de la última generación'),
+                ('CenterDistance', 'Resultado', 'Distancia entre ejes')]
+PART_PROPS = [('Pair', 'Sinfín y rueda', 'Objeto con los parámetros'),
+              ('Index', 'Sinfín y rueda', '0 = sinfín, 1 = rueda')]
 
 
 def params(obj):
@@ -83,22 +92,49 @@ def add_properties(obj):
         name, key, kind, group, doc = p[:5]
         if name in obj.PropertiesList:
             continue
-        obj.addProperty(kind, name, group, doc)
+        obj.addProperty(kind, name, tr(group), tr(doc))
         v = G.DEFAULTS[key]
         if kind in ('App::PropertyIntegerConstraint', 'App::PropertyFloatConstraint'):
             setattr(obj, name, (v,) + tuple(p[5]))
         else:
             if kind == 'App::PropertyEnumeration':
-                setattr(obj, name, [label for _, label in G.BORE_SHAPES])
+                setattr(obj, name, [BORE_LABEL[k] for k, _ in G.BORE_SHAPES])
             _set(obj, p, v)
+
+
+def relabel(obj, props):
+    """Pone los grupos, las descripciones y las listas de taladros en el idioma actual (al abrir un documento
+    guardado en otro). props = [(propiedad, grupo, descripción, tipo)]. Devuelve si ha cambiado algo."""
+    changed = False
+    for name, group, doc, kind in props:
+        group, doc = tr(group), tr(doc)
+        if name not in obj.PropertiesList:
+            continue
+        try:
+            if obj.getGroupOfProperty(name) != group:
+                obj.setGroupOfProperty(name, group)
+                changed = True
+            if obj.getDocumentationOfProperty(name) != doc:
+                obj.setDocumentationOfProperty(name, doc)
+                changed = True
+        except AttributeError:   # FreeCAD sin esas funciones: se quedan como estaban
+            pass
+        if kind == 'App::PropertyEnumeration':
+            labels = [BORE_LABEL[k] for k, _ in G.BORE_SHAPES]
+            if obj.getEnumerationsOfProperty(name) != labels:
+                key = BORE_KEY.get(getattr(obj, name), 'round')
+                setattr(obj, name, labels)
+                setattr(obj, name, BORE_LABEL[key])
+                changed = True
+    return changed
 
 
 class WormGearPair:
     def __init__(self, obj):
         add_properties(obj)
-        obj.addProperty('App::PropertyString', 'Summary', 'Resultado', 'Relación, distancia entre ejes, diámetros…')
-        obj.addProperty('App::PropertyStringList', 'Warnings', 'Resultado', 'Avisos de la última generación')
-        obj.addProperty('App::PropertyLength', 'CenterDistance', 'Resultado', 'Distancia entre ejes')
+        for (name, group, doc), kind in zip(RESULT_PROPS, ('App::PropertyString', 'App::PropertyStringList',
+                                                          'App::PropertyLength')):
+            obj.addProperty(kind, name, tr(group), tr(doc))
         for name in ('Summary', 'Warnings', 'CenterDistance'):
             obj.setEditorMode(name, 1)   # solo lectura
         obj.setEditorMode('Placement', 2)   # oculto: lo que se mueve son las piezas
@@ -136,6 +172,8 @@ class WormGearPair:
     def onDocumentRestored(self, obj):
         self._cache = {}
         add_properties(obj)   # documentos de versiones anteriores
+        if relabel(obj, [(p[0], p[3], p[4], p[2]) for p in PROPS] + [p + (None,) for p in RESULT_PROPS]):   # documento guardado en otro idioma: la geometría no cambia
+            obj.purgeTouched()
 
     def dumps(self):
         return None
@@ -151,8 +189,8 @@ class WormGearPart:
     """Una de las dos piezas (Index 0 = sinfín, 1 = rueda) del compound de un WormGearPair."""
 
     def __init__(self, obj, pair, index):
-        obj.addProperty('App::PropertyLink', 'Pair', 'Sinfín y rueda', 'Objeto con los parámetros')
-        obj.addProperty('App::PropertyInteger', 'Index', 'Sinfín y rueda', '0 = sinfín, 1 = rueda')
+        for (name, group, doc), kind in zip(PART_PROPS, ('App::PropertyLink', 'App::PropertyInteger')):
+            obj.addProperty(kind, name, tr(group), tr(doc))
         obj.Pair = pair
         obj.Index = index
         obj.setEditorMode('Index', 2)   # oculto
@@ -161,10 +199,14 @@ class WormGearPart:
     def execute(self, obj):
         solids = obj.Pair.Shape.Solids if obj.Pair else []
         if len(solids) != 2:
-            raise ValueError('"%s" no tiene los dos sólidos.' % (obj.Pair.Label if obj.Pair else '?'))
+            raise ValueError(tr('"%s" no tiene los dos sólidos.') % (obj.Pair.Label if obj.Pair else '?'))
         shape = solids[obj.Index].copy()
         shape.Placement = obj.Placement   # los sólidos vienen sin Placement: así se conserva si se mueve la pieza
         obj.Shape = shape
+
+    def onDocumentRestored(self, obj):
+        if relabel(obj, [p + (None,) for p in PART_PROPS]):
+            obj.purgeTouched()
 
     def dumps(self):
         return None
@@ -213,7 +255,7 @@ def create(doc=None, prm=None):
         if prm and p[1] in prm:
             _set(pair, p, prm[p[1]])
     parts = []
-    for index, label in ((0, 'Sinfín'), (1, 'Rueda')):
+    for index, label in ((0, tr('Sinfín')), (1, tr('Rueda'))):
         o = doc.addObject('Part::FeaturePython', 'WormGearWorm' if index == 0 else 'WormGearWheel')
         WormGearPart(o, pair, index)
         o.Label = label
@@ -223,6 +265,6 @@ def create(doc=None, prm=None):
         pair.ViewObject.Visibility = False
         for o in parts:
             ViewProviderPart(o.ViewObject)
-    pair.Label = 'Sinfín y rueda m%g %d-%d%s' % (pair.Module.Value, pair.Teeth, pair.Starts,
-                                                ' izq' if pair.LeftHanded else '')
+    pair.Label = tr('Sinfín y rueda m%g %d-%d%s') % (pair.Module.Value, pair.Teeth, pair.Starts,
+                                                    tr(' izq') if pair.LeftHanded else '')
     return pair, parts[0], parts[1]

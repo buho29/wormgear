@@ -3,6 +3,7 @@ import FreeCAD as App
 import FreeCADGui as Gui
 
 from . import features as F
+from .i18n import tr
 
 
 def _selected_pair():
@@ -17,19 +18,19 @@ def _selected_pair():
 
 class CreatePair:
     def GetResources(self):
-        return {'Pixmap': F.ICON, 'MenuText': 'Sinfín y rueda',
-                'ToolTip': 'Crea un sinfín y su rueda lisa, paramétricos y pensados para imprimir sin soportes.\n'
-                           'Los parámetros están en el objeto "Sinfín y rueda" (oculto) del árbol.'}
+        return {'Pixmap': F.ICON, 'MenuText': tr('Sinfín y rueda'),
+                'ToolTip': tr('Crea un sinfín y su rueda lisa, paramétricos y pensados para imprimir sin soportes.\n'
+                              'Los parámetros están en el objeto "Sinfín y rueda" (oculto) del árbol.')}
 
     def IsActive(self):
         return True
 
     def Activated(self):
         doc = App.ActiveDocument or App.newDocument()
-        doc.openTransaction('Sinfín y rueda')
+        doc.openTransaction(tr('Sinfín y rueda'))
         try:
             pair, worm, wheel = F.create(doc)
-            App.Console.PrintMessage('Generando el sinfín y la rueda (la rueda tarda unos segundos)…\n')
+            App.Console.PrintMessage(tr('Generando el sinfín y la rueda (la rueda tarda unos segundos)…') + '\n')
             doc.recompute()
         finally:
             doc.commitTransaction()
@@ -41,9 +42,9 @@ class CreatePair:
 
 class CheckMesh:
     def GetResources(self):
-        return {'Pixmap': F.ICON, 'MenuText': 'Comprobar engrane',
-                'ToolTip': 'Mide la interferencia entre el sinfín y la rueda en 8 posiciones de un diente y el juego.\n'
-                           'Selecciona antes el sinfín, la rueda o el objeto "Sinfín y rueda". Tarda un par de minutos.'}
+        return {'Pixmap': F.ICON, 'MenuText': tr('Comprobar engrane'),
+                'ToolTip': tr('Mide la interferencia entre el sinfín y la rueda en 8 posiciones de un diente y el juego.\n'
+                              'Selecciona antes el sinfín, la rueda o el objeto "Sinfín y rueda". Tarda un par de minutos.')}
 
     def IsActive(self):
         return _selected_pair() is not None
@@ -53,14 +54,14 @@ class CheckMesh:
         from . import check as C, geometry as G
         pair = _selected_pair()
         if pair.State and 'Invalid' in pair.State:
-            QtGui.QMessageBox.warning(Gui.getMainWindow(), 'Comprobar engrane', 'Primero tiene que generarse bien.')
+            QtGui.QMessageBox.warning(Gui.getMainWindow(), tr('Comprobar engrane'), tr('Primero tiene que generarse bien.'))
             return
         q = G.derive(F.params(pair))
         worm, wheel = [s.copy() for s in pair.Shape.Solids]
         for s in (worm, wheel):            # en el marco de shapes.py, aunque se haya movido el objeto
             s.Placement = App.Placement()
-        dlg = QtGui.QProgressDialog('Comprobando el engrane…', 'Cancelar', 0, 100, Gui.getMainWindow())
-        dlg.setWindowTitle('Comprobar engrane')
+        dlg = QtGui.QProgressDialog(tr('Comprobando el engrane…'), tr('Cancelar'), 0, 100, Gui.getMainWindow())
+        dlg.setWindowTitle(tr('Comprobar engrane'))
         dlg.setWindowModality(QtCore.Qt.WindowModal)
         dlg.setMinimumDuration(0)
 
@@ -82,7 +83,7 @@ class CheckMesh:
         ok, text = C.report(res, q)
         App.Console.PrintMessage('%s\n%s\n' % (pair.Label, text))
         box = QtGui.QMessageBox.information if ok else QtGui.QMessageBox.warning
-        box(Gui.getMainWindow(), 'Comprobar engrane', text)
+        box(Gui.getMainWindow(), tr('Comprobar engrane'), text)
 
 
 def register():

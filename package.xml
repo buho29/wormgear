@@ -2,7 +2,7 @@
 <!-- Metadatos para el gestor de complementos de FreeCAD. El add-in de Fusion (fusion/) no lo usa. -->
 <package format="1" xmlns="https://wiki.freecad.org/Package_Metadata">
   <name>WormGear</name>
-  <description>Sinfín y rueda dentada lisa, paramétricos y pensados para imprimir en 3D sin soportes. La rueda se talla con la envolvente exacta del sinfín.</description>
+  <description>Parametric worm and smooth worm wheel for 3D printing without supports; the wheel is cut by the exact envelope of the worm. / Sinfín y rueda dentada lisa, paramétricos y pensados para imprimir en 3D sin soportes; la rueda se talla con la envolvente exacta del sinfín.</description>
   <version>1.2.0</version>
   <date>2026-10-31</date>
   <maintainer email="47985666+buho29@users.noreply.github.com">buho29</maintainer>

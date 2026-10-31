@@ -3,12 +3,14 @@ import os
 
 import FreeCADGui as Gui
 
+from freecad.wormgear.i18n import tr
+
 ICON = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources', '64x64.png')
 
 
 class WormGearWorkbench(Gui.Workbench):
-    MenuText = 'Sinfín y rueda'
-    ToolTip = 'Sinfín y rueda lisa paramétricos, para imprimir en 3D'
+    MenuText = tr('Sinfín y rueda')
+    ToolTip = tr('Sinfín y rueda lisa paramétricos, para imprimir en 3D')
     Icon = ICON
 
     def GetClassName(self):
@@ -17,8 +19,8 @@ class WormGearWorkbench(Gui.Workbench):
     def Initialize(self):
         from freecad.wormgear import commands
         names = commands.register()
-        self.appendToolbar('Sinfín y rueda', names)
-        self.appendMenu('Sinfín y rueda', names)
+        self.appendToolbar(tr('Sinfín y rueda'), names)
+        self.appendMenu(tr('Sinfín y rueda'), names)
 
     def Activated(self):
         pass

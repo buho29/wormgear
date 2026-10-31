@@ -19,6 +19,11 @@
 
 import math
 
+try:
+    from .i18n import tr
+except ImportError:   # python geometry.py, sin paquete
+    from i18n import tr
+
 DEFAULTS = dict(
     module=1.5,          # módulo (mm)
     starts=1,            # entradas del sinfín
@@ -208,7 +213,7 @@ def flank(q, c, sigma, n=40):
     out.sort(key=lambda v: v[0])
     pts = [v[1] for v in out]
     if len(pts) < 2:
-        raise ValueError('no se pudo calcular el flanco en z=%.2f' % c)
+        raise ValueError(tr('no se pudo calcular el flanco en z=%.2f') % c)
     L = [0.0]
     for a, b in zip(pts, pts[1:]):
         L.append(L[-1] + math.dist(a, b))
@@ -268,17 +273,17 @@ def _keyway(size):
 def bore_error(shape, size, flat):
     """Por qué no se puede hacer ese taladro, o None."""
     if shape not in dict(BORE_SHAPES):
-        return 'forma de taladro desconocida (%s)' % shape
+        return tr('forma de taladro desconocida (%s)') % shape
     if size <= 0:
         return None
     if shape == 'd' and not size / 2 < flat < size:
-        return 'el plano en D tiene que estar entre %.2f y %.2f mm del lado opuesto' % (size / 2, size)
+        return tr('el plano en D tiene que estar entre %.2f y %.2f mm del lado opuesto') % (size / 2, size)
     if shape == 'keyway':
         k = _keyway(size)
         if k is None:
-            return 'el chavetero DIN 6885 va de Ø6 a Ø65'
+            return tr('el chavetero DIN 6885 va de Ø6 a Ø65')
         if k[0] / 2 >= size / 2:
-            return 'el chavetero es más ancho que el taladro'
+            return tr('el chavetero es más ancho que el taladro')
     return None
 
 
@@ -365,56 +370,56 @@ def check_params(prm):
     q = derive(prm)
     errors, warns = [], []
     if q['starts'] < 1 or q['teeth'] < 3:
-        errors.append('Entradas ≥ 1 y dientes ≥ 3.')
+        errors.append(tr('Entradas ≥ 1 y dientes ≥ 3.'))
     for part, name in (('worm', 'Taladro del sinfín'), ('wheel', 'Taladro de la rueda')):
         e = bore_error(q[part + '_bore_shape'], q[part + '_bore'], q[part + '_bore_flat'])
         if e:
-            errors.append('%s: %s.' % (name, e))
+            errors.append('%s: %s.' % (tr(name), e))
     rb_worm = bore_radius(q['worm_bore_shape'], q['worm_bore'], q['worm_bore_flat'])
     rb_wheel = bore_radius(q['wheel_bore_shape'], q['wheel_bore'], q['wheel_bore_flat'])
     partial = q['thread_half'] < q['worm_length'] / 2
     if q['r_root'] <= rb_worm + 0.8:
-        errors.append('El taladro del sinfín no cabe: pared de %.2f mm bajo el fondo del filete.' % (q['r_root'] - rb_worm))
+        errors.append(tr('El taladro del sinfín no cabe: pared de %.2f mm bajo el fondo del filete.') % (q['r_root'] - rb_worm))
     if partial:
         L, T = q['worm_length'] / 2, q['thread_half']
         if q['r_shoulder'] > q['r_chamfer'] + 1e-9:
-            errors.append('Los tramos lisos pueden tener como mucho Ø%.2f (el fondo del filete menos %.1f mm).'
+            errors.append(tr('Los tramos lisos pueden tener como mucho Ø%.2f (el fondo del filete menos %.1f mm).')
                           % (2 * q['r_chamfer'], 2 * CHAMFER_BELOW_ROOT))
         elif q['r_shoulder'] <= rb_worm + 0.8:
-            errors.append('El taladro del sinfín no cabe en los tramos lisos: pared de %.2f mm.' % (q['r_shoulder'] - rb_worm))
+            errors.append(tr('El taladro del sinfín no cabe en los tramos lisos: pared de %.2f mm.') % (q['r_shoulder'] - rb_worm))
         elif L - T < q['r_chamfer'] - q['r_shoulder'] + 0.5:
-            errors.append('Los tramos lisos son demasiado cortos para el escalón de 45° hasta Ø%.2f: '
-                          'acorta el filete o alarga el sinfín.' % (2 * q['r_shoulder']))
+            errors.append(tr('Los tramos lisos son demasiado cortos para el escalón de 45° hasta Ø%.2f: '
+                          'acorta el filete o alarga el sinfín.') % (2 * q['r_shoulder']))
     # el filete entero (sin chaflán) tiene que cubrir toda la zona en la que entra la rueda
     need = 2 * (q['x_contact'] + q['r_tip'] - q['r_chamfer'])
     if 2 * q['thread_half'] < need:
-        errors.append('El filete es demasiado corto para la rueda: tiene que medir al menos %.1f mm.' % need)
+        errors.append(tr('El filete es demasiado corto para la rueda: tiene que medir al menos %.1f mm.') % need)
     if q['wheel_width'] / 2 + 0.5 >= q['hob_tip']:
-        errors.append('La rueda es demasiado ancha para este sinfín (ancho/2 tiene que ser < %.1f mm).' % (q['hob_tip'] - 0.5))
+        errors.append(tr('La rueda es demasiado ancha para este sinfín (ancho/2 tiene que ser < %.1f mm).') % (q['hob_tip'] - 0.5))
     crest = 2 * hw(q, q['r_tip'])
     gap_root = q['p'] - 2 * hw(q, q['r_root'], q['backlash'] / 2)
     if crest <= 0:
-        errors.append('El filete del sinfín acaba en punta (cresta %.2f mm): baja la cabeza o el flanco.' % crest)
+        errors.append(tr('El filete del sinfín acaba en punta (cresta %.2f mm): baja la cabeza o el flanco.') % crest)
     elif crest < 0.4:
-        warns.append('Cresta del sinfín de %.2f mm (< 0.4).' % crest)
+        warns.append(tr('Cresta del sinfín de %.2f mm (< 0.4).') % crest)
     if gap_root <= 0:
-        errors.append('El hueco del sinfín se cierra en el fondo: baja el pie o el flanco.')
+        errors.append(tr('El hueco del sinfín se cierra en el fondo: baja el pie o el flanco.'))
     elif gap_root < 0.3:
-        warns.append('Fondo del hueco del sinfín de %.2f mm.' % gap_root)
+        warns.append(tr('Fondo del hueco del sinfín de %.2f mm.') % gap_root)
     if q['flank_deg'] < 45:
-        warns.append('Con el sinfín de pie, la cara de abajo del filete queda a %.0f° de voladizo.' % (90 - q['flank_deg']))
+        warns.append(tr('Con el sinfín de pie, la cara de abajo del filete queda a %.0f° de voladizo.') % (90 - q['flank_deg']))
     if q['wheel_width'] / 2 > q['c_touch']:
-        warns.append('Los dientes no llegan a las caras: el sinfín solo toca la rueda en %.1f mm de ancho '
-                     '(estrecha la rueda o agranda el sinfín).' % (2 * q['c_touch']))
+        warns.append(tr('Los dientes no llegan a las caras: el sinfín solo toca la rueda en %.1f mm de ancho '
+                     '(estrecha la rueda o agranda el sinfín).') % (2 * q['c_touch']))
     elif q['wheel_width'] / 2 > q['throat'] * math.sin(math.radians(45)):
-        warns.append('La garganta de la rueda pasa de 45° en las caras: estrecha la rueda o agranda el sinfín.')
+        warns.append(tr('La garganta de la rueda pasa de 45° en las caras: estrecha la rueda o agranda el sinfín.'))
     if q['ha'] + q['clearance'] > q['R2'] * math.sin(q['alpha']) ** 2:
-        warns.append('Puede haber socavado en el pie de los dientes de la rueda (pocos dientes para este flanco).')
+        warns.append(tr('Puede haber socavado en el pie de los dientes de la rueda (pocos dientes para este flanco).'))
     hub = q['A'] - q['hob_tip'] - rb_wheel
     if hub <= 0.8:
-        errors.append('El taladro de la rueda no cabe: quedan %.2f mm hasta el fondo de los dientes.' % hub)
+        errors.append(tr('El taladro de la rueda no cabe: quedan %.2f mm hasta el fondo de los dientes.') % hub)
     elif hub < 2:
-        warns.append('Queda poco cubo entre el taladro y el fondo de los dientes (%.1f mm).' % hub)
+        warns.append(tr('Queda poco cubo entre el taladro y el fondo de los dientes (%.1f mm).') % hub)
     land = None
     if not errors:
         try:
@@ -422,29 +427,29 @@ def check_params(prm):
         except ValueError as e:
             errors.append(str(e))
     if land is not None and land < 0.3:
-        warns.append('Los dientes de la rueda quedan en punta en el borde (%.2f mm): baja "borde sobre la cabeza".' % land)
+        warns.append(tr('Los dientes de la rueda quedan en punta en el borde (%.2f mm): baja "borde sobre la cabeza".') % land)
     eta_g, eta_d = efficiency(q, MU_GREASED)[0], efficiency(q, MU_DRY)[0]
     lim_g, lim_d = locking_limit_deg(q, MU_GREASED), locking_limit_deg(q, MU_DRY)
     if q['lead_angle_deg'] <= lim_g:
-        locking = 'autobloqueante: la rueda no mueve el sinfín ni con grasa (con grasa lo es hasta %.1f° de hélice)' % lim_g
+        locking = tr('autobloqueante: la rueda no mueve el sinfín ni con grasa (con grasa lo es hasta %.1f° de hélice)') % lim_g
     elif q['lead_angle_deg'] <= lim_d:
-        locking = ('puede bloquearse en seco, pero con grasa la rueda mueve el sinfín (con grasa se bloquea hasta %.1f° '
-                   'de hélice)' % lim_g)
+        locking = tr('puede bloquearse en seco, pero con grasa la rueda mueve el sinfín (con grasa se bloquea hasta %.1f° '
+                     'de hélice)') % lim_g
     else:
-        locking = 'reversible: la rueda mueve el sinfín (en seco se bloquea hasta %.1f° de hélice)' % lim_d
-    summary = ('Relación %g:1 (%d dientes / %d entradas) · entre ejes %.2f mm · avance %.3f mm · hélice %.2f° a %s\n'
-               'Rendimiento %.0f %% con grasa (μ %.1f) y %.0f %% en seco (μ %.1f) · %s\n'
-               'Sinfín Ø%.2f / fondo Ø%.2f · rueda Ø%.2f primitivo, borde Ø%.2f · cresta del sinfín %.2f mm%s'
+        locking = tr('reversible: la rueda mueve el sinfín (en seco se bloquea hasta %.1f° de hélice)') % lim_d
+    summary = (tr('Relación %g:1 (%d dientes / %d entradas) · entre ejes %.2f mm · avance %.3f mm · hélice %.2f° a %s\n'
+                  'Rendimiento %.0f %% con grasa (μ %.1f) y %.0f %% en seco (μ %.1f) · %s\n'
+                  'Sinfín Ø%.2f / fondo Ø%.2f · rueda Ø%.2f primitivo, borde Ø%.2f · cresta del sinfín %.2f mm%s')
                % (round(q['teeth'] / q['starts'], 3), q['teeth'], q['starts'], q['A'], q['lead'], q['lead_angle_deg'],
-                  'izquierdas' if q['hand'] < 0 else 'derechas',
+                  tr('izquierdas') if q['hand'] < 0 else tr('derechas'),
                   100 * eta_g, MU_GREASED, 100 * eta_d, MU_DRY, locking,
                   2 * q['r_tip'], 2 * q['r_root'], 2 * q['R2'], 2 * q['rim'], crest,
-                  '' if land is None else ' · cabeza del diente de la rueda %.2f mm' % land))
+                  '' if land is None else tr(' · cabeza del diente de la rueda %.2f mm') % land))
     if partial:
-        summary += ('\nFilete de %.1f mm (mínimo %.1f) y tramos lisos de Ø%.2f'
+        summary += (tr('\nFilete de %.1f mm (mínimo %.1f) y tramos lisos de Ø%.2f')
                     % (2 * q['thread_half'], need, 2 * q['r_shoulder']))
     if q['chamfer_z'] is not None:
-        summary += ('\nChaflán de 45° en las caras desde z = ±%.2f mm (ahí el diente baja de la mitad de su altura)'
+        summary += (tr('\nChaflán de 45° en las caras desde z = ±%.2f mm (ahí el diente baja de la mitad de su altura)')
                     % q['chamfer_z'])
     return q, errors, warns, summary
 

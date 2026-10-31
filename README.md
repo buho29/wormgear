@@ -4,6 +4,8 @@
 
 ### Sinfín y rueda dentada para imprimir en 3D, sin soportes
 
+**Español** · [English](README.en.md)
+
 [![Licencia MIT](https://img.shields.io/badge/licencia-MIT-green.svg)](LICENSE)
 [![Fusion 360](https://img.shields.io/badge/Fusion%20360-add--in-F37021?logo=autodesk&logoColor=white)](fusion/README.md)
 [![FreeCAD 1.0+](https://img.shields.io/badge/FreeCAD-1.0%2B-418FDE?logo=freecad&logoColor=white)](freecad/README.md)
@@ -24,7 +26,7 @@ Genera un tornillo sin fin y su rueda dentada, paramétricos y pensados para imp
 | Add-in con diálogo y resumen en vivo. En ensamblajes crea juntas de giro y un enlace de movimiento con la relación: arrastras el sinfín y gira la rueda. | Banco de trabajo con objetos paramétricos: cambias una propiedad y se recalcula. |
 | **Instalación:** zip de las [Releases](https://github.com/buho29/wormgear/releases) con `instalar.bat`. → [más](fusion/README.md#instalación) | **Instalación:** gestor de complementos (repositorio personalizado) o copia en `Mod`. → [más](freecad/README.md#instalación) |
 
-La matemática está en `wormgear/geometry.py`, que no depende de ningún CAD y es igual en las dos versiones (las pruebas de FreeCAD avisan si las copias dejan de coincidir). Lo que cambia es cómo se construyen los sólidos en cada programa.
+La matemática está en `wormgear/geometry.py`, que no depende de ningún CAD y es igual en las dos versiones, como los textos en inglés de `wormgear/i18n.py` (las pruebas de FreeCAD avisan si las copias dejan de coincidir). Lo que cambia es cómo se construyen los sólidos en cada programa.
 
 ## ✨ Qué trae
 
@@ -35,6 +37,7 @@ La matemática está en `wormgear/geometry.py`, que no depende de ningún CAD y 
 - 🔄 **A derechas o a izquierdas:** la versión a izquierdas es la simétrica, igual de exacta.
 - 🔩 **Taladros** redondos, con plano en D (ejes de motor), hexagonales, cuadrados o con chavetero DIN 6885.
 - 🛞 **Tramos lisos en el sinfín:** el filete puede ser más corto que el sinfín, para apoyar los extremos en rodamientos.
+- 🌐 **En castellano o en inglés:** el diálogo, las propiedades, los avisos y los nombres de las piezas salen en castellano si Fusion o FreeCAD lo están, y en inglés con cualquier otro idioma.
 - 🖨️ **Pensado para imprimir:** con los valores por defecto (flanco de 45° y diente bajo), el sinfín se imprime de pie y la rueda tumbada, los dos sin soportes.
 
 ## 🔧 Parámetros

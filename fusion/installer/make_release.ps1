@@ -13,10 +13,10 @@ New-Item -ItemType Directory -Force (Join-Path $stage 'WormGear\wormgear') | Out
 New-Item -ItemType Directory -Force (Join-Path $stage 'WormGear\resources') | Out-Null
 
 # Lo que carga Fusion (sin settings.json, __pycache__, install.ps1 ni este instalador)
-Copy-Item (Join-Path $root 'WormGear.manifest'), (Join-Path $root 'WormGear.py'), (Join-Path $root 'README.md'), (Join-Path $root '..\LICENSE') (Join-Path $stage 'WormGear')
+Copy-Item (Join-Path $root 'WormGear.manifest'), (Join-Path $root 'WormGear.py'), (Join-Path $root 'README.md'), (Join-Path $root 'README.en.md'), (Join-Path $root '..\LICENSE') (Join-Path $stage 'WormGear')
 Copy-Item (Join-Path $root 'wormgear\*.py') (Join-Path $stage 'WormGear\wormgear')
 Copy-Item (Join-Path $root 'resources\*.png') (Join-Path $stage 'WormGear\resources')
-Copy-Item (Join-Path $PSScriptRoot 'instalar.bat'), (Join-Path $PSScriptRoot 'desinstalar.bat'), (Join-Path $PSScriptRoot 'LEEME.txt') $stage
+Copy-Item (Join-Path $PSScriptRoot 'instalar.bat'), (Join-Path $PSScriptRoot 'desinstalar.bat'), (Join-Path $PSScriptRoot 'LEEME.txt'), (Join-Path $PSScriptRoot 'README.txt') $stage
 
 if (Test-Path $zip) { Remove-Item $zip -Force }
 # Entradas a mano con '/': Compress-Archive y CreateFromDirectory de PowerShell 5 guardan '\' y en Mac no se descomprime bien
