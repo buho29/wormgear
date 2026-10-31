@@ -96,6 +96,6 @@ Al terminar, el resultado sale en un mensaje. Este es el del juego de las imáge
 - `wormgear/build.py`: crea la geometría en el diseño activo.
 - `wormgear/check.py`: comprueba interferencias y juego.
 - `resources/`: los iconos.
-- `img/`: las imágenes de este README. El GIF se hizo desde el MCP de Fusion: los cuerpos se copian como gráficos personalizados, se giran con la relación y se guarda un fotograma por posición. Los diagramas del cálculo están en el [`img/`](../img/) de la raíz.
+- `img/`: las imágenes de este README. El GIF se hizo desde el MCP de Fusion: los cuerpos y sus aristas se copian como gráficos personalizados (mallas y líneas), se giran con la relación y se guarda un fotograma por posición. Se giran los vértices, no la transformación del gráfico: así la caja envolvente no crece y el suelo, con su sombra, no se mueve. Los diagramas del cálculo están en el [`img/`](../img/) de la raíz.
 - `install.ps1`: registra esta carpeta en la lista de complementos de Fusion.
 - `installer/`: `instalar.bat`, `desinstalar.bat` y `LEEME.txt`, que van en el zip, y `make_release.ps1`, que lo genera.
