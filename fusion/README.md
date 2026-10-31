@@ -22,7 +22,7 @@ Las imágenes son de un juego generado con el add-in: módulo 1.5, 60 dientes, s
 2. Haz doble clic en `instalar.bat`. Copia la carpeta `WormGear` en la carpeta de complementos de Fusion y no pide permisos de administrador.
 3. En Fusion: **Utilidades > Complementos** (Mayús+S) > *WormGear* > **Ejecutar**, y marca *Al iniciar*.
 
-Para actualizar, ejecuta el `instalar.bat` de la versión nueva: se conservan los últimos valores del diálogo. Para quitarlo, usa `desinstalar.bat`. Ninguno de los dos toca una instalación de desarrollo hecha con `install.ps1` (un enlace).
+Para actualizar, ejecuta el `instalar.bat` de la versión nueva: se conservan los últimos valores del diálogo. Para quitarlo, usa `desinstalar.bat`. No los uses en un equipo con la instalación de desarrollo de `install.ps1`: tendrías el complemento dos veces.
 
 En Mac, copia a mano la carpeta `WormGear` del zip a `~/Library/Application Support/Autodesk/Autodesk Fusion 360/API/AddIns/`.
 
@@ -37,9 +37,9 @@ En Mac, copia a mano la carpeta `WormGear` del zip a `~/Library/Application Supp
 powershell -ExecutionPolicy Bypass -File fusion\install.ps1
 ```
 
-El script crea un enlace (junction) desde `%APPDATA%\Autodesk\Autodesk Fusion 360\API\AddIns\WormGear` hasta esta carpeta. Fusion carga directamente lo que hay en el repo.
+Cierra Fusion antes. El script apunta la lista de complementos de Fusion a esta carpeta, como el botón **+** del diálogo de complementos, y marca *Al iniciar*. Fusion carga directamente lo que hay en el repo y arranca el complemento al abrirse.
 
-Después, en Fusion: **Utilidades > Complementos** (Mayús+S) > *WormGear* > **Ejecutar**. Marca *Al iniciar* para que arranque siempre.
+No se usa un enlace (junction) en `%APPDATA%\Autodesk\Autodesk Fusion 360\API\AddIns`: Fusion lo sigue hasta el repo y el complemento sale dos veces. Si queda uno de una instalación anterior, el script lo quita.
 
 Si cambias el código, para el complemento y vuelve a ejecutarlo.
 
@@ -97,5 +97,5 @@ Al terminar, el resultado sale en un mensaje. Este es el del juego de las imáge
 - `wormgear/check.py`: comprueba interferencias y juego.
 - `resources/`: los iconos.
 - `img/`: las imágenes de este README. El GIF se hizo desde el MCP de Fusion: los cuerpos se copian como gráficos personalizados, se giran con la relación y se guarda un fotograma por posición. Los diagramas del cálculo están en el [`img/`](../img/) de la raíz.
-- `install.ps1`: crea el enlace en la carpeta AddIns.
+- `install.ps1`: registra esta carpeta en la lista de complementos de Fusion.
 - `installer/`: `instalar.bat`, `desinstalar.bat` y `LEEME.txt`, que van en el zip, y `make_release.ps1`, que lo genera.
