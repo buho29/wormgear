@@ -64,6 +64,8 @@ Los parámetros son los mismos que en Fusion. Están, con sus valores por defect
 
 Los nombres de las propiedades van en inglés porque son identificadores de FreeCAD. Al pasar el ratón por encima sale la descripción en castellano.
 
+Las formas de taladro (`Worm Bore Shape`, `Wheel Bore Shape`) se eligen en una lista. Los documentos hechos con la versión anterior se abren bien: al abrirlos se añaden las propiedades nuevas con su valor por defecto.
+
 Además, el grupo **Resultado** tiene tres propiedades de solo lectura:
 - `Center Distance`: la distancia entre ejes;
 - `Summary`: el resumen (relación, distancia entre ejes, ángulo de hélice y autobloqueo, diámetros);
@@ -88,6 +90,8 @@ Lo que cambia es la construcción, que en FreeCAD se hace con OCCT:
   - si el cono del chaflán pasa justo por la arista del núcleo en el extremo, falla en uno de cada cuatro largos. Por eso el chaflán empieza 0.3 mm por debajo del fondo del filete.
 
   Además se comprueba el volumen del resultado, para dar un error en vez de una pieza mal hecha.
+- **Los taladros** son un prisma del contorno (redondo, D, hexagonal, cuadrado o chavetero) que se resta al final.
+- **A izquierdas**, el sinfín se espeja al final; la rueda ya sale espejada de los perfiles.
 - No hay juntas: FreeCAD no tiene enlaces de movimiento como Fusion.
 
 ## Pruebas
@@ -96,7 +100,7 @@ Lo que cambia es la construcción, que en FreeCAD se hace con OCCT:
 & "C:\Program Files\FreeCAD 1.1\bin\freecadcmd.exe" freecad\tests\run_tests.py
 ```
 
-Genera y comprueba tres juegos (unos 10 minutos en total). Con la variable `WORMGEAR_OUT` deja además los STL en esa carpeta. Los resultados con FreeCAD 1.1.4 están en la [portada](../README.md#-comprobación-del-engrane): 0 mm³ de interferencia y un juego medido de 0.101 a 0.104 mm (pedido 0.100 mm) en los tres.
+Genera y comprueba cuatro juegos (unos 12 minutos en total), uno de ellos a izquierdas, con tramos lisos y taladros hexagonal y en D. Con la variable `WORMGEAR_OUT` deja además los STL en esa carpeta. Los resultados con FreeCAD 1.1.4 están en la [portada](../README.md#-comprobación-del-engrane): 0 mm³ de interferencia y un juego medido de 0.100 a 0.104 mm (pedido 0.100 mm) en los cuatro.
 
 ## Archivos
 

@@ -30,7 +30,8 @@ _handlers = []
 _state = {}   # comando abierto y última validación (útil para depurar)
 
 # (id del grupo, título, [(parámetro, etiqueta, tipo, mín, máx, paso)])
-#   tipos: len = mm, ang = grados, int = entero, float = número sin unidades
+#   tipos: len = mm, ang = grados, int = entero, float = número sin unidades, bool = casilla,
+#   bore = forma de taladro (lista de geometry.BORE_SHAPES)
 FIELDS = [
     ('g_gear', 'Engrane', [
         ('module', 'Módulo', 'len'),
@@ -42,14 +43,21 @@ FIELDS = [
         ('dedendum_f', 'Pie (× módulo)', 'float', 0.1, 1.5, 0.05),
         ('clearance', 'Holgura radial', 'len'),
         ('backlash', 'Holgura entre flancos', 'len'),
+        ('left_handed', 'A izquierdas', 'bool'),
     ]),
     ('g_worm', 'Sinfín', [
         ('worm_length', 'Longitud', 'len'),
-        ('worm_bore', 'Ø taladro (0 = sin taladro)', 'len'),
+        ('thread_length', 'Longitud con filete (0 = todo)', 'len'),
+        ('shoulder_d', 'Ø tramos lisos (0 = auto)', 'len'),
+        ('worm_bore_shape', 'Taladro', 'bore'),
+        ('worm_bore', 'Ø o entre caras (0 = sin taladro)', 'len'),
+        ('worm_bore_flat', 'Plano en D (al lado opuesto)', 'len'),
     ]),
     ('g_wheel', 'Rueda', [
         ('wheel_width', 'Ancho', 'len'),
-        ('wheel_bore', 'Ø taladro (0 = sin taladro)', 'len'),
+        ('wheel_bore_shape', 'Taladro', 'bore'),
+        ('wheel_bore', 'Ø o entre caras (0 = sin taladro)', 'len'),
+        ('wheel_bore_flat', 'Plano en D (al lado opuesto)', 'len'),
         ('rim_over_tip', 'Borde sobre la cabeza', 'len'),
         ('sections', 'Perfiles de la solevación', 'int', 5, 80, 2),
     ]),
@@ -87,6 +95,10 @@ def _read(inputs):
                     bad.append(label)
                     continue
                 prm[key] = inp.value * 10.0 if kind == 'len' else inp.value * 180.0 / 3.141592653589793
+            elif kind == 'bore':
+                prm[key] = G.BORE_SHAPES[inp.selectedItem.index][0] if inp.selectedItem else 'round'
+            elif kind == 'bool':
+                prm[key] = bool(inp.value)
             else:
                 prm[key] = inp.value
     prm['starts'] = int(prm.get('starts', 1))
@@ -136,6 +148,12 @@ class _CreatedHandler(adsk.core.CommandCreatedEventHandler):
                         gi.addValueInput(key, label, 'deg', adsk.core.ValueInput.createByString('%g deg' % v))
                     elif kind == 'int':
                         gi.addIntegerSpinnerCommandInput(key, label, f[3], f[4], f[5], int(v))
+                    elif kind == 'bool':
+                        gi.addBoolValueInput(key, label, True, '', bool(v))
+                    elif kind == 'bore':
+                        dd = gi.addDropDownCommandInput(key, label, adsk.core.DropDownStyles.TextListDropDownStyle)
+                        for k, text in G.BORE_SHAPES:
+                            dd.listItems.add(text, k == v)
                     else:
                         gi.addFloatSpinnerCommandInput(key, label, '', f[3], f[4], f[5], float(v))
             opt = inputs.addGroupCommandInput('g_opt', 'Opciones').children
@@ -144,6 +162,7 @@ class _CreatedHandler(adsk.core.CommandCreatedEventHandler):
                 dd.listItems.add(label, key == s.get('what', 'both'))
             opt.addBoolValueInput('check', 'Comprobar engrane al terminar', True, '', bool(s.get('check', True)))
             inputs.addTextBoxCommandInput('info', 'Resumen', _evaluate(inputs)[0], 12, True)
+            _update_visibility(inputs)
 
             for ev, h in ((cmd.execute, _ExecuteHandler()), (cmd.inputChanged, _ChangedHandler()),
                           (cmd.validateInputs, _ValidateHandler())):
@@ -151,6 +170,18 @@ class _CreatedHandler(adsk.core.CommandCreatedEventHandler):
                 _handlers.append(h)
         except Exception:
             _ui.messageBox('Sinfín y rueda: error al abrir el diálogo\n' + traceback.format_exc())
+
+
+def _update_visibility(inputs):
+    """El plano en D solo se ve con ese taladro, y el Ø de los tramos lisos solo si los hay."""
+    for part in ('worm', 'wheel'):
+        shape = inputs.itemById(part + '_bore_shape')
+        flat = inputs.itemById(part + '_bore_flat')
+        if shape and flat:
+            flat.isVisible = bool(shape.selectedItem) and G.BORE_SHAPES[shape.selectedItem.index][0] == 'd'
+    tl, sd = inputs.itemById('thread_length'), inputs.itemById('shoulder_d')
+    if tl and sd:
+        sd.isVisible = not tl.isValidExpression or tl.value > 0
 
 
 def _refresh(inputs):
@@ -172,7 +203,9 @@ class _ChangedHandler(adsk.core.InputChangedEventHandler):
         if args.input.id == 'info':
             return
         # args.inputs es solo el grupo del campo cambiado: hacen falta todos los del comando
-        _refresh(args.firingEvent.sender.commandInputs)
+        inputs = args.firingEvent.sender.commandInputs
+        _update_visibility(inputs)
+        _refresh(inputs)
 
 
 class _ValidateHandler(adsk.core.ValidateInputsEventHandler):

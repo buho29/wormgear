@@ -1,5 +1,5 @@
 # Pruebas sin interfaz:  "C:\Program Files\FreeCAD 1.1\bin\freecadcmd.exe" freecad\tests\run_tests.py
-# Genera el sinfín y la rueda con tres juegos de parámetros y comprueba que:
+# Genera el sinfín y la rueda con cuatro juegos de parámetros y comprueba que:
 # - los dos sólidos son válidos y la rueda sale con unas 6 caras por diente;
 # - no hay interferencia en 8 fases de un diente y el juego medido es la holgura pedida;
 # - geometry.py es idéntico al del add-in de Fusion.
@@ -24,6 +24,9 @@ CASES = [
                               worm_pitch_d=20, wheel_width=12, worm_length=36, rim_over_tip=0.8)),
     ('m1.5 60 dientes 3 entradas 30°', dict(module=1.5, teeth=60, starts=3, flank_deg=30, worm_pitch_d=25,
                                             worm_length=40, wheel_width=14)),
+    ('izquierdas, 2 entradas, tramos lisos, hexagonal y D', dict(
+        starts=2, left_handed=True, worm_length=40, thread_length=26, shoulder_d=10, worm_bore_shape='hex',
+        worm_bore=5.6, wheel_bore_shape='d', wheel_bore=5.1, wheel_bore_flat=4.6)),
 ]
 
 

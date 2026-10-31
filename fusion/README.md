@@ -77,7 +77,9 @@ Todo queda en un grupo de la línea de tiempo y se deshace con un solo Ctrl+Z.
 
 El cálculo de la rueda es el común, explicado en la [portada](../README.md#-cómo-se-calcula-la-rueda). En Fusion:
 - **el sinfín** es un barrido del perfil axial a lo largo de una hélice;
-- **la rueda** se hace con un boceto por plano con dos splines y dos arcos, una solevación, un patrón circular, el corte del disco con su garganta toroidal y el chaflán.
+- **la rueda** se hace con un boceto por plano con dos splines y dos arcos, una solevación, un patrón circular, el corte del disco con su garganta toroidal y el chaflán;
+- **los taladros** son un boceto y una extrusión de corte al final de cada pieza: se pueden editar en la línea de tiempo;
+- **a izquierdas**, el enlace de movimiento va invertido.
 
 ## Comprobar engrane
 

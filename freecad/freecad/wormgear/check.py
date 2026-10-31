@@ -29,7 +29,7 @@ def check(q, worm_shape, wheel_shape, phases=8, progress=None):
         for eps in (0.0, 1e-6, -1e-6, 1e-5, -1e-5):
             w = worm_shape.copy()
             w.rotate(axis_c, axis_d, math.degrees((theta + eps) * q['teeth'] / q['starts'] + dphi))
-            w.rotate(V(0, 0, 0), V(0, 0, 1), -math.degrees(theta + eps))
+            w.rotate(V(0, 0, 0), V(0, 0, 1), -q['hand'] * math.degrees(theta + eps))   # a izquierdas, al revés
             try:
                 v = zone.common(w).Volume
             except Exception:

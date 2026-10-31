@@ -32,6 +32,9 @@ La matemática está en `wormgear/geometry.py`, que no depende de ningún CAD y 
 - 📐 **Chaflán automático de 45°** en las caras de la rueda, donde los dientes salen bajos.
 - ⚠️ **Avisos** mientras eliges los valores: cresta del sinfín muy fina, garganta de más de 45°, voladizos, socavado, dientes en punta y poco cubo. Con un error no deja generar.
 - 🔍 **Comprobación del engrane:** mide la interferencia en 8 posiciones y el juego real entre flancos.
+- 🔄 **A derechas o a izquierdas:** la versión a izquierdas es la simétrica, igual de exacta.
+- 🔩 **Taladros** redondos, con plano en D (ejes de motor), hexagonales, cuadrados o con chavetero DIN 6885.
+- 🛞 **Tramos lisos en el sinfín:** el filete puede ser más corto que el sinfín, para apoyar los extremos en rodamientos.
 - 🖨️ **Pensado para imprimir:** con los valores por defecto (flanco de 45° y diente bajo), el sinfín se imprime de pie y la rueda tumbada, los dos sin soportes.
 
 ## 🔧 Parámetros
@@ -48,12 +51,25 @@ Son los mismos en las dos versiones. En Fusion salen en el diálogo; en FreeCAD 
 | | Cabeza / pie (× módulo) | `Addendum Factor` / `Dedendum Factor` | 0.5 / 0.6 (diente bajo: con 45° uno normal acaba en punta) |
 | | Holgura radial | `Clearance` | 0.15 mm |
 | | Holgura entre flancos | `Backlash` | 0.1 mm |
-| Sinfín | Longitud, Ø taladro | `Worm Length`, `Worm Bore` | 30 mm, 5.1 mm |
-| Rueda | Ancho, Ø taladro | `Wheel Width`, `Wheel Bore` | 10 mm, 8.1 mm |
+| | A izquierdas | `Left Handed` | no |
+| Sinfín | Longitud | `Worm Length` | 30 mm |
+| | Longitud con filete (0 = todo) | `Thread Length` | 0 |
+| | Ø de los tramos lisos (0 = el fondo del filete menos 0.6 mm) | `Shoulder Diameter` | 0 |
+| | Taladro: forma, Ø o entre caras, plano en D | `Worm Bore Shape`, `Worm Bore`, `Worm Bore Flat` | redondo, 5.1 mm (plano a 4.6 mm) |
+| Rueda | Ancho | `Wheel Width` | 10 mm |
+| | Taladro: forma, Ø o entre caras, plano en D | `Wheel Bore Shape`, `Wheel Bore`, `Wheel Bore Flat` | redondo, 8.1 mm (plano a 7.6 mm) |
 | | Borde sobre la cabeza | `Rim Over Tip` | 0.63 mm |
 | | Perfiles de la solevación | `Sections` | 23 |
 
-Con los valores puestos, las dos versiones muestran la relación de transmisión, la distancia entre ejes, el ángulo de hélice (y si el sinfín se autobloquea), los diámetros y los avisos.
+Los taladros:
+- **redondo**, **plano en D** y **chavetero** se miden por el Ø; **hexagonal** y **cuadrado**, entre caras;
+- en el **plano en D**, la medida es del plano al lado opuesto: para un eje de motor de 5 mm con el plano a 4.5 mm, 5.1 y 4.6 (con la holgura de 0.1 de impresión);
+- el **chavetero** sale de la tabla DIN 6885 con el Ø redondeado, con 0.1 mm de holgura en el ancho y en el fondo;
+- todos quedan verticales al imprimir (sinfín de pie y rueda tumbada), así que no añaden voladizos.
+
+Los **tramos lisos** van a los dos lados del filete, que queda centrado. Si son más finos que el núcleo, el escalón es de 45°. El filete tiene que cubrir toda la zona en la que entra la rueda: si es más corto, da error y dice el mínimo.
+
+Con los valores puestos, las dos versiones muestran la relación de transmisión, la distancia entre ejes, el ángulo de hélice (con la mano y si el sinfín se autobloquea), los diámetros y los avisos.
 
 ## 🔍 Comprobación del engrane
 
@@ -68,8 +84,9 @@ Resultados de las pruebas de FreeCAD (`freecad/tests/run_tests.py`):
 | m1.5, 30 dientes, 1 entrada, 45° (por defecto) | 6.2 | 0 mm³ | 0.104 mm |
 | m2, 20 dientes, 2 entradas, 30° | 6.2 | 0 mm³ | 0.101 mm |
 | m1.5, 60 dientes, 3 entradas, 30° | 6.1 | 0 mm³ | 0.101 mm |
+| m1.5, 30 dientes, 2 entradas, 45°, **a izquierdas**, filete de 26 mm en un sinfín de 40 con tramos lisos de Ø10, taladro hexagonal en el sinfín y con plano en D en la rueda | 6.2 | 0 mm³ | 0.100 mm |
 
-En Fusion, los tres juegos (los valores por defecto; m2, 2 entradas y 30°; y m1.5, 60 dientes, 3 entradas y 30°) dieron 0 mm³ y un juego de 0.100 mm. Con los valores por defecto, eso son ±3.8° de giro del sinfín.
+En Fusion, los tres primeros juegos (los valores por defecto; m2, 2 entradas y 30°; y m1.5, 60 dientes, 3 entradas y 30°) dieron 0 mm³ y un juego de 0.100 mm. Con los valores por defecto, eso son ±3.8° de giro del sinfín. El juego a izquierdas dio 0 mm³ y 0.101 mm, y con el enlace de movimiento la rueda gira al revés sin chocar.
 
 ## 🧮 Cómo se calcula la rueda
 
@@ -113,6 +130,8 @@ Cerca de las caras, el sinfín llega cada vez menos y los dientes salen bajos y 
 - con la rueda tumbada, se imprime sin soportes.
 
 El resultado es de unas 6 caras por diente.
+
+**A izquierdas** no hace falta otra cuenta: se calcula a derechas y se toma el simétrico respecto al plano que pasa por el eje del sinfín y es perpendicular al de la rueda. El simétrico de un engrane sin interferencias es otro engrane sin interferencias; solo cambia el sentido de giro de la rueda.
 
 <details>
 <summary><b>📚 De dónde sale el método</b></summary>

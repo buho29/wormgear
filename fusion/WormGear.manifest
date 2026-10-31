@@ -6,7 +6,7 @@
   "description": {
     "": "Sinfín y rueda paramétricos: la rueda se hace con perfiles de envolvente calculados y una solevación (dientes lisos, sin interferencias)."
   },
-  "version": "1.0.0",
+  "version": "1.1.0",
   "runOnStartup": true,
   "supportedOS": "windows|mac",
   "editEnabled": true

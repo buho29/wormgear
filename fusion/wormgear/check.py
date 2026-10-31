@@ -40,7 +40,7 @@ def check(q, worm_body, wheel_body, phases=8):
         for eps in (0.0, 1e-6, -1e-6, 1e-5, -1e-5):
             w = tbm.copy(worm)
             tbm.transform(w, worm_axis_rotation(q, (theta + eps) * q['teeth'] / q['starts'] + dphi))
-            tbm.transform(w, wheel_rotation(-(theta + eps)))
+            tbm.transform(w, wheel_rotation(-q['hand'] * (theta + eps)))   # a izquierdas, al revés
             z = tbm.copy(zone)
             try:
                 tbm.booleanOperation(z, w, I)

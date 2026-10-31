@@ -25,16 +25,33 @@ PROPS = [
     ('DedendumFactor', 'dedendum_f', 'App::PropertyFloatConstraint', 'Engrane', 'Pie del filete (× módulo)', (0.1, 1.5, 0.05)),
     ('Clearance', 'clearance', 'App::PropertyLength', 'Engrane', 'Holgura radial entre la cabeza y el fondo'),
     ('Backlash', 'backlash', 'App::PropertyLength', 'Engrane', 'Holgura entre flancos, medida en el eje del sinfín'),
+    ('LeftHanded', 'left_handed', 'App::PropertyBool', 'Engrane', 'Sinfín a izquierdas (y su rueda)'),
     ('WormLength', 'worm_length', 'App::PropertyLength', 'Sinfín', 'Longitud del sinfín'),
-    ('WormBore', 'worm_bore', 'App::PropertyLength', 'Sinfín', 'Diámetro del taladro del sinfín (0 = sin taladro)'),
+    ('ThreadLength', 'thread_length', 'App::PropertyLength', 'Sinfín',
+     'Longitud con filete, centrada (0 = todo el sinfín); el resto son tramos lisos'),
+    ('ShoulderDiameter', 'shoulder_d', 'App::PropertyLength', 'Sinfín',
+     'Diámetro de los tramos lisos (0 = el fondo del filete menos 0.6 mm)'),
+    ('WormBoreShape', 'worm_bore_shape', 'App::PropertyEnumeration', 'Sinfín', 'Forma del taladro del sinfín'),
+    ('WormBore', 'worm_bore', 'App::PropertyLength', 'Sinfín',
+     'Diámetro del taladro del sinfín, o medida entre caras si es hexagonal o cuadrado (0 = sin taladro)'),
+    ('WormBoreFlat', 'worm_bore_flat', 'App::PropertyLength', 'Sinfín',
+     'Taladro con plano en D: distancia del plano al lado opuesto'),
     ('WheelWidth', 'wheel_width', 'App::PropertyLength', 'Rueda', 'Ancho de la rueda'),
-    ('WheelBore', 'wheel_bore', 'App::PropertyLength', 'Rueda', 'Diámetro del taladro de la rueda (0 = sin taladro)'),
+    ('WheelBoreShape', 'wheel_bore_shape', 'App::PropertyEnumeration', 'Rueda', 'Forma del taladro de la rueda'),
+    ('WheelBore', 'wheel_bore', 'App::PropertyLength', 'Rueda',
+     'Diámetro del taladro de la rueda, o medida entre caras si es hexagonal o cuadrado (0 = sin taladro)'),
+    ('WheelBoreFlat', 'wheel_bore_flat', 'App::PropertyLength', 'Rueda',
+     'Taladro con plano en D: distancia del plano al lado opuesto'),
     ('RimOverTip', 'rim_over_tip', 'App::PropertyLength', 'Rueda',
      'Cuánto sobresale el borde de la rueda por encima de la cabeza de sus dientes en el plano medio'),
     ('Sections', 'sections', 'App::PropertyIntegerConstraint', 'Rueda', 'Perfiles de la solevación del hueco', (5, 81, 2)),
 ]
-WORM_ONLY = ('worm_length', 'worm_bore')                                  # no cambian la rueda
-WHEEL_ONLY = ('wheel_width', 'wheel_bore', 'rim_over_tip', 'sections')   # no cambian el sinfín
+# no cambian la rueda / no cambian el sinfín
+WORM_ONLY = ('worm_length', 'thread_length', 'shoulder_d', 'worm_bore_shape', 'worm_bore', 'worm_bore_flat')
+WHEEL_ONLY = ('wheel_width', 'wheel_bore_shape', 'wheel_bore', 'wheel_bore_flat', 'rim_over_tip', 'sections')
+# las enumeraciones guardan la etiqueta en castellano; geometry usa la clave
+BORE_LABEL = dict(G.BORE_SHAPES)
+BORE_KEY = {label: key for key, label in G.BORE_SHAPES}
 
 
 def params(obj):
@@ -43,20 +60,42 @@ def params(obj):
     for p in PROPS:
         name, key, kind = p[0], p[1], p[2]
         v = getattr(obj, name)
+        if kind == 'App::PropertyEnumeration':
+            v = BORE_KEY.get(v, 'round')
         prm[key] = v.Value if hasattr(v, 'Value') else v
     return prm
 
 
+def _set(obj, p, v):
+    """Pone el valor v (como en geometry) en la propiedad p de PROPS."""
+    name, kind = p[0], p[2]
+    if kind == 'App::PropertyIntegerConstraint':
+        v = int(v)
+    elif kind == 'App::PropertyEnumeration':
+        v = BORE_LABEL.get(v, BORE_LABEL['round'])
+    setattr(obj, name, v)
+
+
+def add_properties(obj):
+    """Añade las propiedades que falten, con su valor por defecto (también en los documentos de versiones
+    anteriores, al abrirlos)."""
+    for p in PROPS:
+        name, key, kind, group, doc = p[:5]
+        if name in obj.PropertiesList:
+            continue
+        obj.addProperty(kind, name, group, doc)
+        v = G.DEFAULTS[key]
+        if kind in ('App::PropertyIntegerConstraint', 'App::PropertyFloatConstraint'):
+            setattr(obj, name, (v,) + tuple(p[5]))
+        else:
+            if kind == 'App::PropertyEnumeration':
+                setattr(obj, name, [label for _, label in G.BORE_SHAPES])
+            _set(obj, p, v)
+
+
 class WormGearPair:
     def __init__(self, obj):
-        for p in PROPS:
-            name, key, kind, group, doc = p[:5]
-            obj.addProperty(kind, name, group, doc)
-            v = G.DEFAULTS[key]
-            if kind in ('App::PropertyIntegerConstraint', 'App::PropertyFloatConstraint'):
-                setattr(obj, name, (v,) + tuple(p[5]))
-            else:
-                setattr(obj, name, v)
+        add_properties(obj)
         obj.addProperty('App::PropertyString', 'Summary', 'Resultado', 'Relación, distancia entre ejes, diámetros…')
         obj.addProperty('App::PropertyStringList', 'Warnings', 'Resultado', 'Avisos de la última generación')
         obj.addProperty('App::PropertyLength', 'CenterDistance', 'Resultado', 'Distancia entre ejes')
@@ -96,6 +135,7 @@ class WormGearPair:
 
     def onDocumentRestored(self, obj):
         self._cache = {}
+        add_properties(obj)   # documentos de versiones anteriores
 
     def dumps(self):
         return None
@@ -171,8 +211,7 @@ def create(doc=None, prm=None):
     WormGearPair(pair)
     for p in PROPS:
         if prm and p[1] in prm:
-            v = prm[p[1]]
-            setattr(pair, p[0], int(v) if p[2] == 'App::PropertyIntegerConstraint' else v)
+            _set(pair, p, prm[p[1]])
     parts = []
     for index, label in ((0, 'Sinfín'), (1, 'Rueda')):
         o = doc.addObject('Part::FeaturePython', 'WormGearWorm' if index == 0 else 'WormGearWheel')
@@ -184,5 +223,6 @@ def create(doc=None, prm=None):
         pair.ViewObject.Visibility = False
         for o in parts:
             ViewProviderPart(o.ViewObject)
-    pair.Label = 'Sinfín y rueda m%g %d-%d' % (pair.Module.Value, pair.Teeth, pair.Starts)
+    pair.Label = 'Sinfín y rueda m%g %d-%d%s' % (pair.Module.Value, pair.Teeth, pair.Starts,
+                                                ' izq' if pair.LeftHanded else '')
     return pair, parts[0], parts[1]

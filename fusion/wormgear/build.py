@@ -1,8 +1,11 @@
 # Crea el sinfín y la rueda lisa en el diseño activo de Fusion.
 # - Sinfín: perfil axial trapezoidal barrido por una hélice (con una segunda hélice de raíl para que no se tuerza),
-#   unido al núcleo, recortado con chaflanes de 45° y taladrado (cuerpo de un base feature).
+#   unido al núcleo y recortado con la silueta de geometry.worm_outline (chaflanes de 45° y tramos lisos)
+#   (cuerpo de un base feature). A izquierdas, el simétrico (x -> -x).
 # - Rueda: disco en bruto con garganta, N perfiles calculados del hueco (geometry.gap_profile), solevación,
-#   patrón circular y corte. Todo queda en un grupo de la línea de tiempo.
+#   patrón circular y corte.
+# - Taladros: boceto con geometry.bore_outline y extrusión de corte a través de todo (editable).
+# Todo queda en un grupo de la línea de tiempo.
 # En un diseño de ensamblaje cada pieza va en su componente (con junta de giro); en uno de pieza, como cuerpos.
 import math
 import adsk.core
@@ -47,6 +50,7 @@ def wheel_rotation(theta):
 def _thread_body(comp, q, extra, tip, length):
     """Barre un filete y devuelve una copia temporal (borra los bocetos y el barrido)."""
     lead = q['lead']
+    h = q['hand']   # a izquierdas, x -> -x
     # hélice con el centro del filete en x = lead·(t-π)/2π; empieza en t = 2π·k0 (perfil en el plano z = 0)
     k0 = math.floor(-length / 2 / lead + 0.5)
     t0 = 2 * math.pi * k0
@@ -59,7 +63,7 @@ def _thread_body(comp, q, extra, tip, length):
         pts = adsk.core.ObjectCollection.create()
         for i in range(n + 1):
             t = t0 + (t1 - t0) * i / n
-            pts.add(P(lead * (t - math.pi) / (2 * math.pi), q['A'] + r * math.cos(t), r * math.sin(t)))
+            pts.add(P(h * lead * (t - math.pi) / (2 * math.pi), q['A'] + r * math.cos(t), r * math.sin(t)))
         return sk.sketchCurves.sketchFittedSplines.add(pts)
 
     path_curve = helix(q['R1'])
@@ -77,7 +81,7 @@ def _thread_body(comp, q, extra, tip, length):
     for i in range(len(corners)):
         x0, r0 = corners[i]
         x1, r1 = corners[(i + 1) % len(corners)]
-        lines.addByTwoPoints(P(x0, q['A'] + r0, 0), P(x1, q['A'] + r1, 0))
+        lines.addByTwoPoints(P(h * x0, q['A'] + r0, 0), P(h * x1, q['A'] + r1, 0))
     si = comp.features.sweepFeatures.createInput(sk2.profiles.item(0), comp.features.createPath(path_curve, False),
                                                  adsk.fusion.FeatureOperations.NewBodyFeatureOperation)
     si.guideRail = comp.features.createPath(rail_curve, False)
@@ -90,32 +94,57 @@ def _thread_body(comp, q, extra, tip, length):
     return tb
 
 
-def worm_solid(comp, q, extra=0.0, tip=None, length=None, finished=True):
-    """Sinfín como cuerpo temporal. finished=False: sin chaflanes ni taladro (para usarlo de cortador)."""
+def worm_solid(comp, q):
+    """Sinfín como cuerpo temporal, sin taladro."""
     tbm = _tbm()
-    tip = q['r_tip'] if tip is None else tip
-    length = q['worm_length'] if length is None else length
-    L = length / 2
-    thread = _thread_body(comp, q, extra, tip, length + 2 * q['lead'])
+    L = q['worm_length'] / 2
+    A = q['A']
+    thread = _thread_body(comp, q, 0.0, q['r_tip'], q['worm_length'] + 2 * q['lead'])
     for s in range(1, q['starts']):
         other = tbm.copy(thread)
         tbm.transform(other, worm_axis_rotation(q, 2 * math.pi * s / q['starts']))
         tbm.booleanOperation(thread, other, adsk.fusion.BooleanTypes.UnionBooleanType)
-    A = q['A']
     core = _cyl((-L, A, 0), q['r_root'], (L, A, 0), q['r_root'])
     tbm.booleanOperation(thread, core, adsk.fusion.BooleanTypes.UnionBooleanType)
-    if finished:
-        ch = tip - q['r_root']   # chaflán de 45° en las puntas
-        env = _cyl((-L + ch, A, 0), tip, (L - ch, A, 0), tip)
-        tbm.booleanOperation(env, _cyl((-L, A, 0), q['r_root'], (-L + ch, A, 0), tip), adsk.fusion.BooleanTypes.UnionBooleanType)
-        tbm.booleanOperation(env, _cyl((L - ch, A, 0), tip, (L, A, 0), q['r_root']), adsk.fusion.BooleanTypes.UnionBooleanType)
-    else:
-        env = _cyl((-L, A, 0), tip + 1, (L, A, 0), tip + 1)
+    # recorte: sólido de revolución de la silueta (un tronco de cono por tramo)
+    env = None
+    pts = G.worm_outline(q)
+    for (x0, r0), (x1, r1) in zip(pts, pts[1:]):
+        seg = _cyl((x0, A, 0), r0, (x1, A, 0), r1)
+        if env is None:
+            env = seg
+        else:
+            tbm.booleanOperation(env, seg, adsk.fusion.BooleanTypes.UnionBooleanType)
     tbm.booleanOperation(thread, env, adsk.fusion.BooleanTypes.IntersectionBooleanType)
-    if finished and q['worm_bore'] > 0:
-        tbm.booleanOperation(thread, _cyl((-L - 1, A, 0), q['worm_bore'] / 2, (L + 1, A, 0), q['worm_bore'] / 2),
-                             adsk.fusion.BooleanTypes.DifferenceBooleanType)
     return thread
+
+
+def _cut_bore(comp, body, outline, plane, to_model, length, name):
+    """Taladra el cuerpo con un boceto del contorno (geometry.bore_outline) en el plano dado y una extrusión de
+    corte simétrica. to_model(u, v) da el punto del mundo (mm) de cada punto del contorno. Devuelve el cuerpo."""
+    if not outline:
+        return body
+    sk = comp.sketches.add(plane)
+    sk.name = 'Taladro ' + name
+
+    def sp(uv):
+        return sk.modelToSketchSpace(P(*to_model(*uv)))
+    for item in outline:
+        if item[0] == 'circle':
+            sk.sketchCurves.sketchCircles.addByCenterRadius(sp((0.0, 0.0)), item[1] * MM)
+        elif item[0] == 'line':
+            sk.sketchCurves.sketchLines.addByTwoPoints(sp(item[1]), sp(item[2]))
+        else:
+            sk.sketchCurves.sketchArcs.addByThreePoints(sp(item[1]), sp(item[2]), sp(item[3]))
+    sk.isVisible = False
+    if sk.profiles.count != 1:
+        raise RuntimeError('El contorno del taladro de %s no ha salido cerrado (%d perfiles).' % (name, sk.profiles.count))
+    ei = comp.features.extrudeFeatures.createInput(sk.profiles.item(0), adsk.fusion.FeatureOperations.CutFeatureOperation)
+    ei.setSymmetricExtent(adsk.core.ValueInput.createByReal(length * MM), True)
+    ei.participantBodies = [body]
+    ext = comp.features.extrudeFeatures.add(ei)
+    ext.name = 'Taladro ' + name
+    return ext.bodies.item(0) if ext.bodies.count else body
 
 
 def build_worm(comp, q, log):
@@ -126,6 +155,9 @@ def build_worm(comp, q, log):
     comp.bRepBodies.add(tb, bf)
     bf.finishEdit()
     body = bf.bodies.item(0)
+    # taladro a lo largo del eje (X por y = A): boceto en el plano YZ, con u -> y, v -> z
+    body = _cut_bore(comp, body, G.bores(q)[0], comp.yZConstructionPlane, lambda u, v: (0.0, q['A'] + u, v),
+                     q['worm_length'] + 2, 'sinfín')
     body.name = 'Sinfín'
     log.append('Sinfín: %d caras, %.0f mm³' % (body.faces.count, body.volume * 1000))
     return body
@@ -148,9 +180,6 @@ def build_wheel(comp, q, log):
             cone = _cyl((0, 0, sgn * zc), rc, (0, 0, sgn * (W + 1)), rc - (W + 1 - zc))
             tbm.booleanOperation(keep, cone, adsk.fusion.BooleanTypes.UnionBooleanType)
         tbm.booleanOperation(blank, keep, adsk.fusion.BooleanTypes.IntersectionBooleanType)
-    if q['wheel_bore'] > 0:
-        tbm.booleanOperation(blank, _cyl((0, 0, -W - 1), q['wheel_bore'] / 2, (0, 0, W + 1), q['wheel_bore'] / 2),
-                             adsk.fusion.BooleanTypes.DifferenceBooleanType)
     bf = comp.features.baseFeatures.add()
     bf.name = 'Rueda en bruto'
     bf.startEdit()
@@ -218,6 +247,8 @@ def build_wheel(comp, q, log):
     cut = comp.features.combineFeatures.add(ci)
     cut.name = 'Tallar rueda'
     body = cut.bodies.item(0)
+    body = _cut_bore(comp, body, G.bores(q)[1], comp.xYConstructionPlane, lambda u, v: (u, v, 0.0),
+                     q['wheel_width'] + 2, 'rueda')
     body.name = 'Rueda'
     log.append('Rueda: %d caras (%.1f por diente), %.0f mm³' % (body.faces.count, body.faces.count / q['teeth'], body.volume * 1000))
     return body
@@ -275,7 +306,7 @@ def _joints(root, q, tag, parts, log):
             mi = root.motionLinks.createInput(joints['worm'], joints['wheel'])
             mi.valueOne = adsk.core.ValueInput.createByString('360 deg')
             mi.valueTwo = adsk.core.ValueInput.createByString('%.6f deg' % (360.0 * q['starts'] / q['teeth']))
-            mi.isReversed = False
+            mi.isReversed = q['hand'] < 0   # a izquierdas la rueda gira al revés
             ml = root.motionLinks.add(mi)
             ml.name = 'Sinfín %s' % tag
             log.append('Juntas de giro y enlace de movimiento creados: arrastra el sinfín y gira la rueda.')
@@ -296,7 +327,7 @@ def build(design, prm, what='both'):
     root = design.rootComponent
     tl = design.timeline
     start = tl.count
-    tag = 'm%g %d:%d' % (q['module'], q['teeth'], q['starts'])
+    tag = 'm%g %d:%d%s' % (q['module'], q['teeth'], q['starts'], ' izq' if q['hand'] < 0 else '')
 
     # los diseños "de pieza" no admiten componentes: ahí van como cuerpos del raíz.
     # Se mira antes de intentarlo, porque un addNewComponent fallido deja el error pendiente en la API.
