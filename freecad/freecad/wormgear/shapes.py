@@ -18,9 +18,16 @@ from .i18n import tr
 V = App.Vector
 
 
-def _bspline(pts):
+def _bspline(pts, uniform=False):
+    """uniform: parámetros 0, 1/n, ..., 1 en vez de por longitud de cuerda. Para la solevación: si todos los
+    perfiles tienen los mismos nudos, la superficie también; si no, OCCT junta los nudos de todos y con 20° de
+    flanco y diente normal las caras salían con más de 4000 polos y el corte de la rueda se comía la memoria."""
     c = Part.BSplineCurve()
-    c.interpolate(pts)
+    if uniform:
+        n = len(pts) - 1
+        c.interpolate(Points=pts, Parameters=[i / n for i in range(n + 1)])
+    else:
+        c.interpolate(pts)
     return c.toShape()
 
 
@@ -172,9 +179,9 @@ def _gap_wire(q, c):
     a_out = (G.angle_from_y(left[-1]) + G.angle_from_y(right[-1])) / 2
     a_root = (G.angle_from_y(left[0]) + G.angle_from_y(right[0])) / 2
     return Part.Wire([
-        _bspline(lp),
+        _bspline(lp, True),
         Part.Arc(lp[-1], V(ro * math.sin(a_out), ro * math.cos(a_out), c), rp[0]).toShape(),
-        _bspline(rp),
+        _bspline(rp, True),
         Part.Arc(rp[-1], V(rr * math.sin(a_root), rr * math.cos(a_root), c), lp[0]).toShape(),
     ])
 
