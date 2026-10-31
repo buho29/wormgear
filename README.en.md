@@ -129,7 +129,11 @@ This is what it looks like in the mid-plane of a generated set (30:1), cut in Fu
 
 **5. Loft, pattern and cut.** Each plane gives the closed profile of one tooth gap: two splines, the root arc and the outer arc. A **loft** joins the profiles into a solid. Then a circular pattern is made and the blank disc, which carries the toroidal throat, is cut.
 
-![Stacked profiles](img/calc_5_perfiles.png)
+| The computed profiles | The loft in Fusion |
+|---|---|
+| ![Stacked profiles](img/calc_5_perfiles.png) | ![The 23 sketches of one tooth gap and their loft in Fusion](fusion/img/solevacion.png) |
+
+On the right, the loft of one gap in Fusion: each sketch is one plane, with the points of its two splines, and the blue surface is the gap that joins them.
 
 Near the faces, the worm reaches less and less and the teeth get low and weak. That is why the disc has a **45° chamfer on both faces**:
 - it starts where the tooth drops below half its height at the center;

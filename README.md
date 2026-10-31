@@ -129,7 +129,11 @@ Así se ve en el plano medio de un juego generado (30:1), cortado en Fusion mien
 
 **5. Solevación, patrón y corte.** Cada plano da el perfil cerrado del hueco de un diente: dos splines, el arco de fondo y el arco exterior. Una **solevación** une los perfiles en un sólido. Después se hace un patrón circular y se corta el disco en bruto, que lleva la garganta toroidal.
 
-![Perfiles apilados](img/calc_5_perfiles.png)
+| Los perfiles calculados | La solevación en Fusion |
+|---|---|
+| ![Perfiles apilados](img/calc_5_perfiles.png) | ![Los 23 bocetos del hueco de un diente y su solevación en Fusion](fusion/img/solevacion.png) |
+
+A la derecha, la solevación de un hueco en Fusion: cada boceto es un plano, con los puntos de sus dos splines, y la superficie azul es el hueco que los une.
 
 Cerca de las caras, el sinfín llega cada vez menos y los dientes salen bajos y débiles. Por eso el disco lleva un **chaflán de 45° en las dos caras**:
 - empieza donde el diente baja de la mitad de su altura del centro;

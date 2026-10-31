@@ -86,6 +86,10 @@ The wheel calculation is the shared one, explained on the [front page](../README
 - **the bores** are a sketch and a cut extrusion at the end of each part: they can be edited in the timeline;
 - **left-handed**, the motion link is reversed.
 
+![The sketches of one tooth gap and their loft](img/solevacion.png)
+
+The sketches of one tooth gap, one per plane, with the points of their splines, and the loft that joins them (in blue). It is then repeated with the circular pattern and subtracted from the disc.
+
 ## Mesh check
 
 The **Check mesh** checkbox of the dialog runs the [check](../README.en.md#-mesh-check) with temporary bodies: interference at 8 positions and backlash measured on each side. With the defaults it gives 0 mm³ and ±3.8°, which is 0.100 mm axial: exactly the requested clearance.

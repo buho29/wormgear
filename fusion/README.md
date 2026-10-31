@@ -86,6 +86,10 @@ El cálculo de la rueda es el común, explicado en la [portada](../README.md#-c�
 - **los taladros** son un boceto y una extrusión de corte al final de cada pieza: se pueden editar en la línea de tiempo;
 - **a izquierdas**, el enlace de movimiento va invertido.
 
+![Los bocetos del hueco de un diente y su solevación](img/solevacion.png)
+
+Los bocetos del hueco de un diente, uno por plano, con los puntos de sus splines, y la solevación que los une (en azul). Después se repite con el patrón circular y se resta del disco.
+
 ## Comprobar engrane
 
 La casilla **Comprobar engrane** del diálogo hace la [comprobación](../README.md#-comprobación-del-engrane) con cuerpos temporales: interferencia en 8 posiciones y juego medido por cada lado. Con los valores por defecto da 0 mm³ y ±3.8°, que son 0.100 mm axiales: justo la holgura pedida.
