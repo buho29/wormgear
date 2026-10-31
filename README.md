@@ -79,7 +79,7 @@ El primer intento fue mecanizarla: restar el sinfín del disco en muchas posicio
 
 | Primer intento: restas | Ahora: envolvente y solevación |
 |---|---|
-| ![Dientes mecanizados con restas](img/primer_intento_restas.png) | ![Dientes lisos de la solevación](fusion/img/dientes.jpg) |
+| ![Dientes mecanizados con restas](img/rueda_restas.png) | ![Dientes lisos de la solevación](img/rueda_solevacion.png) |
 
 Se calcula así.
 
