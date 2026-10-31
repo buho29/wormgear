@@ -39,6 +39,14 @@ Si cambias el código, reinicia FreeCAD.
 
 ## Uso
 
+Primeros pasos:
+1. Elige **Sinfín y rueda** en el desplegable de bancos de la barra de herramientas (o en **Ver > Banco de trabajo**).
+2. Crea un documento con **Archivo > Nuevo** (Ctrl+N).
+3. Pulsa el botón **Sinfín y rueda**.
+4. Selecciona "Sinfín y rueda …" en el árbol y cambia sus valores en la pestaña *Datos* del panel de propiedades.
+
+![El banco en FreeCAD, con las propiedades del objeto a la izquierda](img/banco.png)
+
 El banco tiene dos botones:
 
 - **Sinfín y rueda** crea tres objetos en el documento activo:
@@ -102,4 +110,4 @@ Genera y comprueba tres juegos (unos 10 minutos en total). Con la variable `WORM
 - `tests/run_tests.py`: las pruebas sin interfaz.
 - `install.ps1`: crea el enlace en la carpeta `Mod`.
 - `../package.xml`: los metadatos para el gestor de complementos. Le dice a FreeCAD que el banco está en esta carpeta.
-- `img/`: las imágenes de este README, sacadas con FreeCAD. Los diagramas del cálculo están en el [`img/`](../img/) de la raíz.
+- `img/`: las imágenes de este README, sacadas con FreeCAD (`banco.png` es una captura de la interfaz). Los diagramas del cálculo están en el [`img/`](../img/) de la raíz.
