@@ -8,7 +8,7 @@ Es parte de [WormGear](../README.md), que también tiene una [versión para Free
 
 ![Sinfín y rueda girando](img/engrane.gif)
 
-Las imágenes son de un juego generado con el add-in: módulo 1.5, 60 dientes, sinfín de 3 entradas (relación 20:1) y flanco de 30°. En la animación, una vuelta del sinfín hace girar la rueda 3 dientes.
+La animación es de un juego generado con el add-in: módulo 1.5, 30 dientes y sinfín de 1 entrada (relación 30:1), con tramos lisos y taladro hexagonal en el sinfín. Una vuelta del sinfín hace girar la rueda un diente. Las imágenes de abajo son de otro juego: 60 dientes, sinfín de 3 entradas (relación 20:1) y flanco de 30°.
 
 | Conjunto | Dientes de la rueda (lisos, de la solevación) |
 |---|---|
