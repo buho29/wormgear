@@ -1,25 +1,136 @@
-# WormGear: sinfín y rueda para imprimir en 3D
+<div align="center">
 
-Genera un tornillo sin fin y su rueda dentada, paramétricos y pensados para imprimir sin soportes. La rueda no se dibuja a ojo: sus dientes se tallan con la envolvente exacta del sinfín, así que salen lisos (unas 6 caras por diente) y no interfieren.
+# ⚙️ WormGear
 
-![Sinfín y rueda girando](fusion/img/engrane.gif)
+### Sinfín y rueda dentada para imprimir en 3D, sin soportes
 
-Hay dos versiones, con la misma matemática (`wormgear/geometry.py`, copiada en las dos):
+[![Licencia MIT](https://img.shields.io/badge/licencia-MIT-green.svg)](LICENSE)
+[![Fusion 360](https://img.shields.io/badge/Fusion%20360-add--in-F37021?logo=autodesk&logoColor=white)](fusion/README.md)
+[![FreeCAD 1.0+](https://img.shields.io/badge/FreeCAD-1.0%2B-418FDE?logo=freecad&logoColor=white)](freecad/README.md)
+[![Python](https://img.shields.io/badge/Python-3-3776AB?logo=python&logoColor=white)](fusion/wormgear/geometry.py)
+[![Releases](https://img.shields.io/github/v/release/buho29/wormgear?label=release)](https://github.com/buho29/wormgear/releases)
 
-| | Qué es | Instalación |
-|---|---|---|
-| [**Fusion 360**](fusion/README.md) | Add-in con diálogo. En ensamblajes crea juntas de giro y un enlace de movimiento con la relación. | Zip de las [Releases](https://github.com/buho29/wormgear/releases) con `instalar.bat`. |
-| [**FreeCAD**](freecad/README.md) | Banco de trabajo con objetos paramétricos: cambias una propiedad y se recalcula. | Gestor de complementos (repositorio personalizado) o copia en `Mod`. |
+<img src="fusion/img/engrane.gif" alt="Sinfín y rueda girando" width="480">
 
-Las dos traen:
-- un chaflán automático de 45° en las caras de la rueda;
-- avisos de voladizos, crestas finas, dientes en punta y poco cubo;
-- una comprobación que mide la interferencia en 8 posiciones y el juego real entre flancos.
+</div>
 
-Los valores por defecto (flanco de 45° y diente bajo) están pensados para imprimir el sinfín de pie y la rueda tumbada sin soportes.
+Genera un tornillo sin fin y su rueda dentada, paramétricos y pensados para imprimir sin soportes. La rueda no se dibuja a ojo: sus dientes se tallan con la **envolvente exacta del sinfín**, así que salen lisos (unas 6 caras por diente) y no interfieren.
 
-Cómo se calcula la rueda, con diagramas: [fusion/README.md](fusion/README.md#cómo-se-calcula-la-rueda).
+## 🧩 Dos versiones, la misma matemática
 
-## Licencia
+| [**Fusion 360**](fusion/README.md) | [**FreeCAD**](freecad/README.md) |
+|---|---|
+| ![Conjunto en Fusion](fusion/img/conjunto.jpg) | ![Conjunto en FreeCAD](freecad/img/conjunto.png) |
+| Add-in con diálogo y resumen en vivo. En ensamblajes crea juntas de giro y un enlace de movimiento con la relación: arrastras el sinfín y gira la rueda. | Banco de trabajo con objetos paramétricos: cambias una propiedad y se recalcula. |
+| **Instalación:** zip de las [Releases](https://github.com/buho29/wormgear/releases) con `instalar.bat`. → [más](fusion/README.md#instalación) | **Instalación:** gestor de complementos (repositorio personalizado) o copia en `Mod`. → [más](freecad/README.md#instalación) |
+
+La matemática está en `wormgear/geometry.py`, que no depende de ningún CAD y es igual en las dos versiones (las pruebas de FreeCAD avisan si las copias dejan de coincidir). Lo que cambia es cómo se construyen los sólidos en cada programa.
+
+## ✨ Qué trae
+
+- 🦷 **Rueda lisa y exacta:** cada diente es una solevación de perfiles calculados con fórmula cerrada, no cientos de restas.
+- 📐 **Chaflán automático de 45°** en las caras de la rueda, donde los dientes salen bajos.
+- ⚠️ **Avisos** mientras eliges los valores: cresta del sinfín muy fina, garganta de más de 45°, voladizos, socavado, dientes en punta y poco cubo. Con un error no deja generar.
+- 🔍 **Comprobación del engrane:** mide la interferencia en 8 posiciones y el juego real entre flancos.
+- 🖨️ **Pensado para imprimir:** con los valores por defecto (flanco de 45° y diente bajo), el sinfín se imprime de pie y la rueda tumbada, los dos sin soportes.
+
+## 🔧 Parámetros
+
+Son los mismos en las dos versiones. En Fusion salen en el diálogo; en FreeCAD son propiedades del objeto, con el nombre en inglés.
+
+| Grupo | Parámetro | Propiedad en FreeCAD | Por defecto |
+|---|---|---|---|
+| Engrane | Módulo (axial) | `Module` | 1.5 mm |
+| | Entradas del sinfín | `Starts` | 1 |
+| | Dientes de la rueda | `Teeth` | 30 |
+| | Ø primitivo del sinfín | `Worm Pitch Diameter` | 16 mm |
+| | Ángulo de flanco (axial) | `Flank Angle` | 45° (sin voladizos de más de 45° con el sinfín de pie) |
+| | Cabeza / pie (× módulo) | `Addendum Factor` / `Dedendum Factor` | 0.5 / 0.6 (diente bajo: con 45° uno normal acaba en punta) |
+| | Holgura radial | `Clearance` | 0.15 mm |
+| | Holgura entre flancos | `Backlash` | 0.1 mm |
+| Sinfín | Longitud, Ø taladro | `Worm Length`, `Worm Bore` | 30 mm, 5.1 mm |
+| Rueda | Ancho, Ø taladro | `Wheel Width`, `Wheel Bore` | 10 mm, 8.1 mm |
+| | Borde sobre la cabeza | `Rim Over Tip` | 0.63 mm |
+| | Perfiles de la solevación | `Sections` | 23 |
+
+Con los valores puestos, las dos versiones muestran la relación de transmisión, la distancia entre ejes, el ángulo de hélice (y si el sinfín se autobloquea), los diámetros y los avisos.
+
+## 🔍 Comprobación del engrane
+
+Con cuerpos temporales, sin tocar las piezas:
+- mide el volumen común entre sinfín y rueda en 8 posiciones de un paso de diente;
+- mide cuánto gira el sinfín, con la rueda quieta, hasta tocar por cada lado (el juego).
+
+Resultados de las pruebas de FreeCAD (`freecad/tests/run_tests.py`):
+
+| Juego | Caras por diente | Interferencia | Juego medido (pedido 0.100 mm) |
+|---|---|---|---|
+| m1.5, 30 dientes, 1 entrada, 45° (por defecto) | 6.2 | 0 mm³ | 0.104 mm |
+| m2, 20 dientes, 2 entradas, 30° | 6.2 | 0 mm³ | 0.101 mm |
+| m1.5, 60 dientes, 3 entradas, 30° | 6.1 | 0 mm³ | 0.101 mm |
+
+En Fusion, los tres juegos (los valores por defecto; m2, 2 entradas y 30°; y m1.5, 60 dientes, 3 entradas y 30°) dieron 0 mm³ y un juego de 0.100 mm. Con los valores por defecto, eso son ±3.8° de giro del sinfín.
+
+## 🧮 Cómo se calcula la rueda
+
+La rueda no se dibuja a ojo, ni se mecaniza con cientos de restas, que dejarían cientos de caras por diente. Se calcula así.
+
+Los diagramas son del juego por defecto (m1.5, 30 dientes, 1 entrada, flanco de 45°) y salen de la misma matemática: `python img/diagramas.py`.
+
+**1. Se corta con planos.** Para cada plano z = c paralelo al plano medio de la rueda, se corta con ese plano el "cortador": el sinfín con cada flanco engordado media holgura y la cabeza un poco más alta.
+
+![Planos paralelos al plano medio](img/calc_1_planos.png)
+
+**2. En cada plano, el sinfín es una cremallera.** Al girar, el filete del sinfín, que es un helicoide, solo se desplaza a lo largo de su eje sin salir del plano. La rueda gira alrededor de Z, así que el plano tampoco se mueve. Por eso lo que pasa en cada plano es un engrane 2D de cremallera y piñón, y su envolvente es la del engrane 3D real, también lejos del centro.
+
+![Sección del sinfín en dos planos](img/calc_2_seccion.png)
+
+**3. El hueco del diente es lo que barre el sinfín.** Si miras desde la rueda, como si estuviera quieta, el sinfín pasa rodando por delante. El hueco del diente es la envolvente de todas sus posiciones: la forma justa para que el filete entre sin tocar.
+
+<p align="center"><img src="img/calc_envolvente.gif" alt="El sinfín tallando el hueco" width="400"></p>
+
+![Envolvente en dos planos](img/calc_3_envolvente.png)
+
+**4. La envolvente se calcula sin simular.** No hace falta probar posiciones. Para cada punto del flanco del sinfín, hay un único giro de la rueda en el que ese punto es el de contacto: aquel en el que la normal al flanco pasa por el punto primitivo P. Despejando sale una fórmula cerrada (`geometry.gap_profile`), y con ella cada punto del flanco da un punto del hueco.
+
+![La normal pasa por el punto primitivo](img/calc_4_normal.png)
+
+**5. Solevación, patrón y corte.** Cada plano da el perfil cerrado del hueco de un diente: dos splines, el arco de fondo y el arco exterior. Una **solevación** une los perfiles en un sólido. Después se hace un patrón circular y se corta el disco en bruto, que lleva la garganta toroidal.
+
+![Perfiles apilados](img/calc_5_perfiles.png)
+
+Cerca de las caras, el sinfín llega cada vez menos y los dientes salen bajos y débiles. Por eso el disco lleva un **chaflán de 45° en las dos caras**:
+- empieza donde el diente baja de la mitad de su altura del centro;
+- no se pone si quitaría menos de 0.3 mm;
+- con la rueda tumbada, se imprime sin soportes.
+
+El resultado es de unas 6 caras por diente.
+
+<details>
+<summary><b>📚 De dónde sale el método</b></summary>
+
+<br>
+
+No está copiado de ningún programa ni documento concreto. Se desarrolló para este proyecto, a partir de la teoría clásica de engranajes. Esto es lo que viene de la teoría y lo que se dedujo aquí:
+
+- **Cortar con planos paralelos al eje del sinfín** (que son los paralelos al plano medio de la rueda) es un método clásico. En cada uno de esos planos, la sección del filete es una cremallera y la rueda engrana con ella como un piñón recto. Así lo plantean Earle Buckingham y Henry H. Ryffel en *Design of Worm and Spiral Gears* (Industrial Press, 1960; reeditado por Buckingham Associates). Lo resumen Stadtfeld y Errichello en [*Conjugate Gears*](https://www.geartechnology.com/conjugate-gears) (Gear Technology, 2023).
+- **Que el resultado sea exacto también lejos del centro** se razonó aquí: girar un helicoide alrededor de su eje equivale a desplazarlo a lo largo de ese eje. Un plano z = c contiene la dirección del eje del sinfín, así que la sección no cambia de forma, solo se desliza en X. La rueda gira alrededor de Z, perpendicular al plano, y el movimiento queda entero dentro del plano. Por eso la envolvente 2D de cada plano es la del engrane 3D real.
+- **La fórmula θ = (x + (y − R2)/x′)/R2** es la ecuación de engrane de cremallera y piñón: toca el punto del flanco cuya normal pasa por el punto primitivo. En la teoría general se escribe como "la normal es perpendicular a la velocidad relativa" (la ecuación de engrane de F. L. Litvin, en *Gear Geometry and Applied Theory*). La forma cerrada para este flanco se dedujo aquí.
+- **La construcción** (perfiles por plano, solevación, patrón, corte y chaflán) es propia del proyecto. En Fusion se hace con splines y operaciones de la línea de tiempo; en FreeCAD, con OCCT ([sus diferencias](freecad/README.md#cómo-se-construye)).
+
+Lo que de verdad lo respalda no es una cita, sino la comprobación con los cuerpos reales del CAD: 0 mm³ de interferencia en 8 posiciones y un juego medido igual a la holgura pedida, en Fusion y en FreeCAD ([resultados](#-comprobación-del-engrane)).
+
+</details>
+
+## 📁 Qué hay en el repo
+
+| Carpeta | Qué es |
+|---|---|
+| [`fusion/`](fusion/README.md) | El add-in de Fusion 360: código, instalador y su README. |
+| [`freecad/`](freecad/README.md) | El banco de trabajo de FreeCAD: código, pruebas y su README. |
+| `img/` | Los diagramas del cálculo. `img/diagramas.py` los dibuja con matplotlib a partir de `fusion/wormgear/geometry.py`. |
+| `package.xml` | Los metadatos para el gestor de complementos de FreeCAD. |
+
+## 📄 Licencia
 
 [MIT](LICENSE).

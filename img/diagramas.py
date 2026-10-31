@@ -1,5 +1,6 @@
 # Dibuja los diagramas de "Cómo se calcula la rueda" del README con la misma matemática del add-in.
-# Uso:  python img/diagramas.py   (desde la carpeta WormGear; necesita matplotlib y Pillow)
+# Uso:  python img/diagramas.py   (desde la raíz del repo; necesita matplotlib y Pillow)
+# La matemática es la de fusion/wormgear/geometry.py (la de FreeCAD es una copia exacta).
 import math
 import os
 import sys
@@ -10,7 +11,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Circle, Polygon
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.dirname(HERE))
+sys.path.insert(0, os.path.join(os.path.dirname(HERE), 'fusion'))
 from wormgear import geometry as G   # noqa: E402
 
 q = G.derive({})          # valores por defecto: m1.5, 30 dientes, 1 entrada, flanco 45°

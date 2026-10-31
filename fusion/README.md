@@ -4,7 +4,7 @@ Genera un tornillo sin fin y su rueda dentada, paramétricos y pensados para imp
 
 Está en **SÓLIDO > CREAR > Sinfín y rueda** (diseños de pieza e híbridos) y en **ENSAMBLAJE > CREAR** (diseños de ensamblaje).
 
-Hay una versión para FreeCAD con la misma matemática: [freecad/](../freecad/README.md).
+Es parte de [WormGear](../README.md), que también tiene una [versión para FreeCAD](../freecad/README.md) con la misma matemática. En la portada están lo común a las dos: los [parámetros](../README.md#-parámetros), la [comprobación](../README.md#-comprobación-del-engrane) y [cómo se calcula la rueda](../README.md#-cómo-se-calcula-la-rueda), con diagramas.
 
 ![Sinfín y rueda girando](img/engrane.gif)
 
@@ -43,26 +43,13 @@ Después, en Fusion: **Utilidades > Complementos** (Mayús+S) > *WormGear* > **E
 
 Si cambias el código, para el complemento y vuelve a ejecutarlo.
 
-## Parámetros
+## El diálogo
 
 <img src="img/dialogo.png" alt="Diálogo del add-in" width="360">
 
-| Grupo | Parámetro | Por defecto |
-|---|---|---|
-| Engrane | Módulo | 1.5 mm |
-| | Entradas del sinfín | 1 |
-| | Dientes de la rueda | 30 |
-| | Ø primitivo del sinfín | 16 mm |
-| | Ángulo de flanco (axial) | 45° (sin voladizos de más de 45° con el sinfín de pie) |
-| | Cabeza / pie | 0.5 / 0.6 × módulo (diente bajo: con 45° uno normal acaba en punta) |
-| | Holgura radial | 0.15 mm |
-| | Holgura entre flancos | 0.1 mm |
-| Sinfín | Longitud, Ø taladro | 30 mm, 5.1 mm |
-| Rueda | Ancho, Ø taladro | 10 mm, 8.1 mm |
-| | Borde sobre la cabeza | 0.63 mm |
-| | Perfiles de la solevación | 23 |
+Los parámetros y sus valores por defecto están en la [portada](../README.md#-parámetros).
 
-El cuadro *Resumen* del diálogo se actualiza mientras se teclea. Muestra:
+El cuadro *Resumen* se actualiza mientras se teclea. Muestra:
 - la relación de transmisión;
 - la distancia entre ejes;
 - el ángulo de hélice, y si el sinfín se autobloquea;
@@ -86,64 +73,19 @@ Todo queda en un grupo de la línea de tiempo y se deshace con un solo Ctrl+Z.
 
 **Cómo imprimirlo:** el sinfín de pie y la rueda tumbada.
 
-## Cómo se calcula la rueda
+## Cómo se construye
 
-La rueda no se dibuja a ojo, ni se mecaniza con cientos de restas, que dejarían cientos de caras por diente. Se calcula así.
+El cálculo de la rueda es el común, explicado en la [portada](../README.md#-cómo-se-calcula-la-rueda). En Fusion:
+- **el sinfín** es un barrido del perfil axial a lo largo de una hélice;
+- **la rueda** se hace con un boceto por plano con dos splines y dos arcos, una solevación, un patrón circular, el corte del disco con su garganta toroidal y el chaflán.
 
-Los diagramas son del juego por defecto (m1.5, 30 dientes, 1 entrada, flanco de 45°) y salen de la misma matemática del add-in: `python img/diagramas.py`.
+## Comprobar engrane
 
-**1. Se corta con planos.** Para cada plano z = c paralelo al plano medio de la rueda, se corta con ese plano el "cortador": el sinfín con cada flanco engordado media holgura y la cabeza un poco más alta.
-
-![Planos paralelos al plano medio](img/calc_1_planos.png)
-
-**2. En cada plano, el sinfín es una cremallera.** Al girar, el filete del sinfín, que es un helicoide, solo se desplaza a lo largo de su eje sin salir del plano. La rueda gira alrededor de Z, así que el plano tampoco se mueve. Por eso lo que pasa en cada plano es un engrane 2D de cremallera y piñón, y su envolvente es la del engrane 3D real, también lejos del centro.
-
-![Sección del sinfín en dos planos](img/calc_2_seccion.png)
-
-**3. El hueco del diente es lo que barre el sinfín.** Si miras desde la rueda, como si estuviera quieta, el sinfín pasa rodando por delante. El hueco del diente es la envolvente de todas sus posiciones: la forma justa para que el filete entre sin tocar.
-
-<img src="img/calc_envolvente.gif" alt="El sinfín tallando el hueco" width="400">
-
-![Envolvente en dos planos](img/calc_3_envolvente.png)
-
-**4. La envolvente se calcula sin simular.** No hace falta probar posiciones. Para cada punto del flanco del sinfín, hay un único giro de la rueda en el que ese punto es el de contacto: aquel en el que la normal al flanco pasa por el punto primitivo P. Despejando sale una fórmula cerrada (`wormgear/geometry.py`), y con ella cada punto del flanco da un punto del hueco.
-
-![La normal pasa por el punto primitivo](img/calc_4_normal.png)
-
-**5. Solevación, patrón y corte.** Cada plano da el perfil cerrado del hueco de un diente: dos splines, el arco de fondo y el arco exterior. Una **solevación** une los perfiles en un sólido. Después se hace un patrón circular y se corta el disco en bruto, que lleva la garganta toroidal.
-
-![Perfiles apilados](img/calc_5_perfiles.png)
-
-Cerca de las caras, el sinfín llega cada vez menos y los dientes salen bajos y débiles. Por eso el disco lleva un **chaflán de 45° en las dos caras**:
-- empieza donde el diente baja de la mitad de su altura del centro;
-- no se pone si quitaría menos de 0.3 mm;
-- con la rueda tumbada, se imprime sin soportes.
-
-El resultado es de unas 6 caras por diente.
-
-La casilla **Comprobar engrane** usa cuerpos temporales:
-- mide el volumen común entre sinfín y rueda en 8 posiciones de un paso de diente;
-- mide cuánto gira el sinfín, con la rueda quieta, hasta tocar por cada lado (el juego).
-
-Con los valores por defecto da 0 mm³ y ±3.8°, que son 0.100 mm axiales. Es justo la holgura pedida.
+La casilla **Comprobar engrane** del diálogo hace la [comprobación](../README.md#-comprobación-del-engrane) con cuerpos temporales: interferencia en 8 posiciones y juego medido por cada lado. Con los valores por defecto da 0 mm³ y ±3.8°, que son 0.100 mm axiales: justo la holgura pedida.
 
 Al terminar, el resultado sale en un mensaje. Este es el del juego de las imágenes:
 
 ![Resultado de la comprobación](img/resultado.png)
-
-### De dónde sale el método
-
-No está copiado de ningún programa ni documento concreto. Se desarrolló para este add-in, a partir de la teoría clásica de engranajes. Esto es lo que viene de la teoría y lo que se dedujo aquí:
-
-- **Cortar con planos paralelos al eje del sinfín** (que son los paralelos al plano medio de la rueda) es un método clásico. En cada uno de esos planos, la sección del filete es una cremallera y la rueda engrana con ella como un piñón recto. Así lo plantean Earle Buckingham y Henry H. Ryffel en *Design of Worm and Spiral Gears* (Industrial Press, 1960; reeditado por Buckingham Associates). Lo resumen Stadtfeld y Errichello en [*Conjugate Gears*](https://www.geartechnology.com/conjugate-gears) (Gear Technology, 2023).
-- **Que el resultado sea exacto también lejos del centro** se razonó aquí: girar un helicoide alrededor de su eje equivale a desplazarlo a lo largo de ese eje. Un plano z = c contiene la dirección del eje del sinfín, así que la sección no cambia de forma, solo se desliza en X. La rueda gira alrededor de Z, perpendicular al plano, y el movimiento queda entero dentro del plano. Por eso la envolvente 2D de cada plano es la del engrane 3D real.
-- **La fórmula θ = (x + (y − R2)/x′)/R2** es la ecuación de engrane de cremallera y piñón: toca el punto del flanco cuya normal pasa por el punto primitivo. En la teoría general se escribe como "la normal es perpendicular a la velocidad relativa" (la ecuación de engrane de F. L. Litvin, en *Gear Geometry and Applied Theory*). La forma cerrada para este flanco se dedujo aquí.
-- **La construcción en Fusion** (splines por plano, solevación, patrón, corte y chaflán) es propia del add-in.
-
-Lo que de verdad lo respalda no es una cita, sino la comprobación con los cuerpos reales de Fusion. Da 0 mm³ de interferencia en 8 posiciones y un juego medido igual a la holgura pedida (0.100 mm). Salió así con:
-- los valores por defecto (m1.5, 30 dientes, 1 entrada, 45°);
-- m2, 2 entradas, 30°;
-- m1.5, 60 dientes, 3 entradas, 30°.
 
 ## Archivos
 
@@ -152,6 +94,6 @@ Lo que de verdad lo respalda no es una cita, sino la comprobación con los cuerp
 - `wormgear/build.py`: crea la geometría en el diseño activo.
 - `wormgear/check.py`: comprueba interferencias y juego.
 - `resources/`: los iconos.
-- `img/`: las imágenes de este README. `img/diagramas.py` dibuja los diagramas del cálculo con matplotlib. El GIF se hizo desde el MCP de Fusion: los cuerpos se copian como gráficos personalizados, se giran con la relación y se guarda un fotograma por posición.
+- `img/`: las imágenes de este README. El GIF se hizo desde el MCP de Fusion: los cuerpos se copian como gráficos personalizados, se giran con la relación y se guarda un fotograma por posición. Los diagramas del cálculo están en el [`img/`](../img/) de la raíz.
 - `install.ps1`: crea el enlace en la carpeta AddIns.
 - `installer/`: `instalar.bat`, `desinstalar.bat` y `LEEME.txt`, que van en el zip, y `make_release.ps1`, que lo genera.
