@@ -39,7 +39,7 @@ Montaje: módulo 1.5, 1 entrada a derechas, 30 dientes, Ø primitivo del sinfín
 |---|---|---|---|
 | 20° | GearWorkBench | De 7.0 a 7.3 mm³; ninguna posición sin choque | 0 |
 | 20° | WormGear | 0 | 0.100 mm |
-| 30° | GearWorkBench | De 0.6 a 1.0 mm³; ninguna posición sin choque | 0 |
+| 30° | GearWorkBench | De 0.9 a 1.0 mm³; ninguna posición sin choque | 0 |
 | 30° | WormGear | 0 | 0.100 mm |
 
 Las imágenes son cortes paralelos al plano medio de la rueda, en la posición con menos choque. El sinfín está en azul, la rueda en naranja y el choque en rojo.
@@ -68,7 +68,7 @@ En las puntas de los dientes de GearWorkBench se ven unos piquitos rojos. Son de
 
 En el plano medio, la garganta corta a 24.23 mm y se lleva la aguja. Lejos de él, la garganta está más alta (24.74 mm a ±2.5 mm y 26.13 mm a ±4.5 mm) y la aguja se queda entera. El sinfín no le deja sitio y la roza: son 0.11 de los 1.01 mm³ del choque. El resto, 0.90 mm³, es el choque de los flancos.
 
-Además, la rueda de GearWorkBench a 30° no es un sólido válido para FreeCAD (`isValid()` da falso y `fix()` no la arregla), y FreeCAD avisa en cada booleano; la de 20° sí es válida. Por eso las medidas pueden tener algo de ruido.
+Además, la rueda de GearWorkBench a 30° no es un sólido válido para FreeCAD (`isValid()` da falso y `fix()` no la arregla), y FreeCAD avisa en cada booleano; la de 20° sí es válida. Con el booleano 3D, una de las 8 posiciones daba 0.59 mm³. Por eso las he medido otra vez sumando el área común de 61 cortes paralelos al plano medio, que no necesita un sólido válido: dan de 0.92 a 0.97 mm³, sin saltos. Con ese método, GearWorkBench a 20° da de 6.9 a 7.2 mm³, lo mismo que el booleano 3D, y WormGear a 30°, 0 mm³.
 
 ## La rueda fácil: un solo corte del sinfín
 

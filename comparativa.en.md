@@ -39,7 +39,7 @@ Set: module 1.5, 1 right-handed start, 30 teeth, worm pitch Ø 16 mm, 10 mm wide
 |---|---|---|---|
 | 20° | GearWorkBench | 7.0 to 7.3 mm³; no position without interference | 0 |
 | 20° | WormGear | 0 | 0.100 mm |
-| 30° | GearWorkBench | 0.6 to 1.0 mm³; no position without interference | 0 |
+| 30° | GearWorkBench | 0.9 to 1.0 mm³; no position without interference | 0 |
 | 30° | WormGear | 0 | 0.100 mm |
 
 The images are sections parallel to the wheel mid-plane, at the position with the least interference. The worm is in blue, the wheel in orange and the interference in red.
@@ -68,7 +68,7 @@ At the tips of the GearWorkBench teeth there are small red spikes. They belong t
 
 In the mid-plane, the throat cuts at 24.23 mm and removes the needle. Away from it, the throat is higher (24.74 mm at ±2.5 mm and 26.13 mm at ±4.5 mm) and the whole needle is left. The worm leaves no room for it and rubs it: that is 0.11 of the 1.01 mm³ of interference. The rest, 0.90 mm³, is the flanks running into each other.
 
-Also, the GearWorkBench wheel at 30° is not a valid solid for FreeCAD (`isValid()` is false and `fix()` does not repair it), and FreeCAD warns about it in every boolean; the 20° one is valid. So the measurements may be somewhat noisy.
+Also, the GearWorkBench wheel at 30° is not a valid solid for FreeCAD (`isValid()` is false and `fix()` does not repair it), and FreeCAD warns about it in every boolean; the 20° one is valid. With the 3D boolean, one of the 8 positions gave 0.59 mm³. So I measured them again by adding up the common area of 61 sections parallel to the mid-plane, which does not need a valid solid: they give 0.92 to 0.97 mm³, with no jumps. With that method, GearWorkBench at 20° gives 6.9 to 7.2 mm³, the same as the 3D boolean, and WormGear at 30°, 0 mm³.
 
 ## The easy wheel: a single cut of the worm
 
