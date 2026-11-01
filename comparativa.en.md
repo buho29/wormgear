@@ -70,6 +70,25 @@ In the mid-plane, the throat cuts at 24.23 mm and removes the needle. Away from 
 
 Also, the GearWorkBench wheel at 30° is not a valid solid for FreeCAD (`isValid()` is false and `fix()` does not repair it), and FreeCAD warns about it in every boolean; the 20° one is valid. So the measurements may be somewhat noisy.
 
+## The easy wheel: a single cut of the worm
+
+A very common way to make the wheel by hand is to subtract the still worm from the blank, keep the gap of one tooth and repeat it around. I tested it with the same set and the same WormGear worm as the test above. I subtracted only the middle thread, what falls inside a 12° wedge (one tooth), and repeated the gap 30 times. As in that method, there is no clearance.
+
+| Flank | Interference (8 positions) | Measured backlash (0.1 mm requested) |
+|---|---|---|
+| 20° | 8.3 to 10.1 mm³; no position without interference | 0 |
+| 30° | 3.1 to 4.3 mm³; no position without interference | 0 |
+
+The images are at the cutting position, which has the least interference. The colours are the same as above.
+
+![Sections of the single-cut wheel at 20°: 8.31 mm³ interference](img/comparativa_corte_unico_20_en.png)
+
+![Sections of the single-cut wheel at 30°: 3.06 mm³ interference](img/comparativa_corte_unico_30_en.png)
+
+The middle gap is exactly the worm's footprint and does not collide. The others are that gap turned about the wheel axis, while the neighbouring threads are shifted in a straight line, because the worm is straight and the wheel is round. Each copy ends up tilted against its thread, and the tip of the tooth runs into it, in the mid-plane too. As they turn, no gap matches its thread any more. For no interference, the gap has to be the envelope, everything the worm sweeps while both turn, which is what WormGear computes.
+
+At 30°, the OCCT 3D boolean loses volume with this wheel: it gives 1.1 to 3.7 mm³ and jumps with turns of a tenth of a degree. So the interference is measured by adding up the common area of 61 sections parallel to the mid-plane. At 20°, both methods agree (8.40 versus 8.31 mm³).
+
 ## What WormGear does not do
 
 - Globoid worms (Onshape, GearWorkBench).

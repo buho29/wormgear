@@ -40,6 +40,22 @@ La matemática está en `wormgear/geometry.py`, que no depende de ningún CAD y 
 - 🌐 **En castellano o en inglés:** el diálogo, las propiedades, los avisos y los nombres de las piezas salen en castellano si Fusion o FreeCAD lo están, y en inglés con cualquier otro idioma.
 - 🖨️ **Pensado para imprimir:** con los valores por defecto (flanco de 45° y diente bajo), el sinfín se imprime de pie y la rueda tumbada, los dos sin soportes.
 
+## ⚖️ Frente a otras formas de dibujar la rueda
+
+Las tres ruedas tienen el mismo montaje: m1.5, 30 dientes, 1 entrada, 20° de flanco y diente normal. Se ven en cortes paralelos al plano medio, con el sinfín en azul, la rueda en naranja y el choque en rojo, en la posición con menos choque.
+
+- **Engranaje helicoidal con garganta.** El diente es una involuta girada a lo largo de una hélice y luego recortada por la garganta. En el plano medio encaja, pero lejos de él no sigue al sinfín y chocan los flancos.
+- **Un solo corte.** Se resta el sinfín quieto al disco y el hueco de un diente se repite alrededor. El hueco del centro encaja, pero los demás quedan girados respecto a sus filetes, porque el sinfín es recto y la rueda redonda, y las puntas de los dientes se meten en ellos.
+- **WormGear.** El hueco es la envolvente de todo lo que barre el sinfín mientras giran los dos: no choca y deja el juego pedido.
+
+![Engranaje helicoidal con garganta a 20°: choque de 7.00 mm³](img/formas_helicoidal_20.png)
+
+![Un solo corte a 20°: choque de 8.31 mm³](img/comparativa_corte_unico_20.png)
+
+![WormGear a 20°: sin choque](img/comparativa_wormgear_20.png)
+
+Las medidas en 8 posiciones y la prueba a 30° están en la [comparativa](comparativa.md#prueba-con-el-mismo-montaje-gearworkbench-y-wormgear).
+
 ## 🔧 Parámetros
 
 Son los mismos en las dos versiones. En Fusion salen en el diálogo; en FreeCAD son propiedades del objeto, con el nombre en inglés.

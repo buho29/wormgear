@@ -40,6 +40,22 @@ The math lives in `wormgear/geometry.py`, which does not depend on any CAD and i
 - 🌐 **Spanish or English:** the dialog, properties, warnings and part names are in Spanish if Fusion or FreeCAD is in Spanish, and in English for any other language.
 - 🖨️ **Made for printing:** with the defaults (45° flank and stub tooth), the worm prints standing and the wheel lying flat, both without supports.
 
+## ⚖️ Compared with other ways of drawing the wheel
+
+The three wheels have the same set: m1.5, 30 teeth, 1 start, 20° flank and full-depth tooth. They are shown in sections parallel to the mid-plane, with the worm in blue, the wheel in orange and the interference in red, at the position with the least interference.
+
+- **Helical gear with a throat.** The tooth is an involute twisted along a helix and then trimmed by the throat. It fits in the mid-plane, but away from it it does not follow the worm and the flanks collide.
+- **Single cut.** The still worm is subtracted from the blank and the gap of one tooth is repeated around. The middle gap fits, but the others end up turned against their threads, because the worm is straight and the wheel is round, and the tooth tips run into them.
+- **WormGear.** The gap is the envelope of everything the worm sweeps while both turn: no interference, and the requested backlash.
+
+![Helical gear with a throat at 20°: 7.00 mm³ interference](img/formas_helicoidal_20_en.png)
+
+![Single cut at 20°: 8.31 mm³ interference](img/comparativa_corte_unico_20_en.png)
+
+![WormGear at 20°: no interference](img/comparativa_wormgear_20_en.png)
+
+The measurements at 8 positions and the 30° test are in the [comparison](comparativa.en.md#test-with-the-same-set-gearworkbench-and-wormgear).
+
 ## 🔧 Parameters
 
 They are the same in both versions. In Fusion they are in the dialog; in FreeCAD they are properties of the object.

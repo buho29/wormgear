@@ -70,6 +70,25 @@ En el plano medio, la garganta corta a 24.23 mm y se lleva la aguja. Lejos de é
 
 Además, la rueda de GearWorkBench a 30° no es un sólido válido para FreeCAD (`isValid()` da falso y `fix()` no la arregla), y FreeCAD avisa en cada booleano; la de 20° sí es válida. Por eso las medidas pueden tener algo de ruido.
 
+## La rueda fácil: un solo corte del sinfín
+
+Una forma muy extendida de hacer la rueda a mano es restar el sinfín quieto al disco, quedarse con el hueco de un diente y repetirlo alrededor. La he probado con el mismo montaje y el mismo sinfín de WormGear de la prueba de arriba. He restado solo el filete del centro, lo que cae en una cuña de 12° (un diente), y he repetido el hueco 30 veces. Como en ese método, no lleva holgura.
+
+| Flanco | Interferencia (8 posiciones) | Juego medido (pedido 0.1 mm) |
+|---|---|---|
+| 20° | De 8.3 a 10.1 mm³; ninguna posición sin choque | 0 |
+| 30° | De 3.1 a 4.3 mm³; ninguna posición sin choque | 0 |
+
+Las imágenes están en la posición del corte, que es la de menos choque. Los colores son los mismos que arriba.
+
+![Cortes de la rueda de un solo corte a 20°: choque de 8.31 mm³](img/comparativa_corte_unico_20.png)
+
+![Cortes de la rueda de un solo corte a 30°: choque de 3.06 mm³](img/comparativa_corte_unico_30.png)
+
+El hueco del centro es justo la huella del sinfín y no choca. Los demás son ese hueco girado alrededor del eje de la rueda, mientras que los filetes de al lado están desplazados en línea recta, porque el sinfín es recto y la rueda redonda. Cada copia queda inclinada respecto a su filete, y la punta del diente se mete en él, también en el plano medio. Al girar, ningún hueco coincide ya con su filete. Para que no choque, el hueco tiene que ser la envolvente, todo lo que barre el sinfín mientras giran los dos, que es lo que calcula WormGear.
+
+Con 30°, el booleano 3D de OCCT pierde volumen con esta rueda: da entre 1.1 y 3.7 mm³ y salta con giros de una décima de grado. Por eso el choque está medido sumando el área común de 61 cortes paralelos al plano medio. Con 20°, los dos métodos dan lo mismo (8.40 frente a 8.31 mm³).
+
 ## Lo que WormGear no hace
 
 - Sinfines globoides (Onshape, GearWorkBench).
