@@ -86,10 +86,11 @@ Results of the FreeCAD tests (`freecad/tests/run_tests.py`):
 |---|---|---|---|
 | m1.5, 30 teeth, 1 start, 45° (default) | 6.2 | 0 mm³ | 0.104 mm |
 | m2, 20 teeth, 2 starts, 30° | 6.2 | 0 mm³ | 0.101 mm |
-| m1.5, 60 teeth, 3 starts, 30° | 6.1 | 0 mm³ | 0.101 mm |
+| m1.5, 60 teeth, 3 starts, 30° | 6.1 | 0 mm³ | 0.102 mm |
+| m1.5, 30 teeth, 1 start, 20° with full-depth tooth (addendum 1·m, dedendum 1.25·m) | 6.2 | 0 mm³ | 0.100 mm |
 | m1.5, 30 teeth, 2 starts, 45°, **left-handed**, 26 mm thread on a 40 mm worm with Ø10 plain ends, hexagonal bore in the worm and D-flat bore in the wheel | 6.2 | 0 mm³ | 0.100 mm |
 
-In Fusion, the first three sets (the defaults; m2, 2 starts and 30°; and m1.5, 60 teeth, 3 starts and 30°) gave 0 mm³ and a backlash of 0.100 mm. With the defaults, that is ±3.8° of worm rotation. The left-handed set gave 0 mm³ and 0.101 mm, and with the motion link the wheel turns the other way without colliding.
+In Fusion, all five sets gave 0 mm³ and a backlash of 0.099 to 0.100 mm. With the defaults, that is ±3.8° of worm rotation. With the left-handed set and the motion link, the wheel turns the other way without colliding.
 
 ## 🧮 How the wheel is computed
 
@@ -125,6 +126,8 @@ This is what it looks like in the mid-plane of a generated set (30:1), cut in Fu
 
 **4. The envelope is computed without simulating.** No positions need to be tried. For each point of the worm flank, there is a single wheel rotation at which that point is the contact point: the one where the normal to the flank passes through the pitch point P. Solving for it gives a closed formula (`geometry.gap_profile`), and with it each point of the flank gives a point of the gap.
 
+The root of the tooth is cut by the corner of the worm tip, which traces a **trochoid** from the bottom of the gap as it rolls. At 45° it hardly shows, but with a small flank angle (20°) the envelope does not reach the bottom and that stretch is all trochoid. At each radius, the gap flank is whichever of the two curves goes further into the tooth.
+
 ![The normal passes through the pitch point](img/calc_4_normal.png)
 
 **5. Loft, pattern and cut.** Each plane gives the closed profile of one tooth gap: two splines, the root arc and the outer arc. A **loft** joins the profiles into a solid. Then a circular pattern is made and the blank disc, which carries the toroidal throat, is cut.
@@ -154,6 +157,7 @@ It is not copied from any particular program or document. It was developed for t
 - **Cutting with planes parallel to the worm axis** (the planes parallel to the mid-plane of the wheel) is a classical method. In each of those planes, the section of the thread is a rack and the wheel meshes with it like a spur pinion. This is how Earle Buckingham and Henry H. Ryffel present it in *Design of Worm and Spiral Gears* (Industrial Press, 1960; reprinted by Buckingham Associates). Stadtfeld and Errichello summarize it in [*Conjugate Gears*](https://www.geartechnology.com/conjugate-gears) (Gear Technology, 2023).
 - **That the result is exact also away from the center** was reasoned here: turning a helicoid about its axis is the same as sliding it along that axis. A plane z = c contains the direction of the worm axis, so the section does not change shape, it only slides in X. The wheel turns about Z, perpendicular to the plane, and the motion stays entirely within the plane. That is why the 2D envelope of each plane is that of the real 3D mesh.
 - **The formula θ = (x + (y − R2)/x′)/R2** is the rack-and-pinion meshing equation: the contact is at the point of the flank whose normal passes through the pitch point. In the general theory it is written as "the normal is perpendicular to the relative velocity" (F. L. Litvin's equation of meshing, in *Gear Geometry and Applied Theory*). The closed form for this flank was derived here.
+- **The root trochoid** comes from the theory of generating cutting: the corner of the tool cuts a root that the envelope alone does not give (it is what undercuts pinions with few teeth).
 - **The construction** (profiles per plane, loft, pattern, cut and chamfer) is the project's own. In Fusion it is done with splines and timeline features; in FreeCAD, with OCCT ([the differences](freecad/README.en.md#how-it-is-built)).
 
 What really backs it up is not a citation, but the check with the real CAD bodies: 0 mm³ of interference at 8 positions and a measured backlash equal to the requested clearance, in Fusion and in FreeCAD ([results](#-mesh-check)).

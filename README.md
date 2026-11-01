@@ -86,10 +86,11 @@ Resultados de las pruebas de FreeCAD (`freecad/tests/run_tests.py`):
 |---|---|---|---|
 | m1.5, 30 dientes, 1 entrada, 45° (por defecto) | 6.2 | 0 mm³ | 0.104 mm |
 | m2, 20 dientes, 2 entradas, 30° | 6.2 | 0 mm³ | 0.101 mm |
-| m1.5, 60 dientes, 3 entradas, 30° | 6.1 | 0 mm³ | 0.101 mm |
+| m1.5, 60 dientes, 3 entradas, 30° | 6.1 | 0 mm³ | 0.102 mm |
+| m1.5, 30 dientes, 1 entrada, 20° con diente normal (cabeza 1·m, pie 1.25·m) | 6.2 | 0 mm³ | 0.100 mm |
 | m1.5, 30 dientes, 2 entradas, 45°, **a izquierdas**, filete de 26 mm en un sinfín de 40 con tramos lisos de Ø10, taladro hexagonal en el sinfín y con plano en D en la rueda | 6.2 | 0 mm³ | 0.100 mm |
 
-En Fusion, los tres primeros juegos (los valores por defecto; m2, 2 entradas y 30°; y m1.5, 60 dientes, 3 entradas y 30°) dieron 0 mm³ y un juego de 0.100 mm. Con los valores por defecto, eso son ±3.8° de giro del sinfín. El juego a izquierdas dio 0 mm³ y 0.101 mm, y con el enlace de movimiento la rueda gira al revés sin chocar.
+En Fusion, los cinco juegos dieron 0 mm³ y un juego de 0.099 a 0.100 mm. Con los valores por defecto, eso son ±3.8° de giro del sinfín. Con el juego a izquierdas y el enlace de movimiento, la rueda gira al revés sin chocar.
 
 ## 🧮 Cómo se calcula la rueda
 
@@ -125,6 +126,8 @@ Así se ve en el plano medio de un juego generado (30:1), cortado en Fusion mien
 
 **4. La envolvente se calcula sin simular.** No hace falta probar posiciones. Para cada punto del flanco del sinfín, hay un único giro de la rueda en el que ese punto es el de contacto: aquel en el que la normal al flanco pasa por el punto primitivo P. Despejando sale una fórmula cerrada (`geometry.gap_profile`), y con ella cada punto del flanco da un punto del hueco.
 
+El pie del diente lo talla la esquina de la cabeza del sinfín, que al rodar dibuja una **trocoide** desde el fondo del hueco. Con 45° casi no se nota, pero con poco ángulo de flanco (20°) la envolvente no baja hasta el fondo y ese tramo es todo trocoide. A cada radio, el flanco del hueco es el de las dos curvas que más entra en el diente.
+
 ![La normal pasa por el punto primitivo](img/calc_4_normal.png)
 
 **5. Solevación, patrón y corte.** Cada plano da el perfil cerrado del hueco de un diente: dos splines, el arco de fondo y el arco exterior. Una **solevación** une los perfiles en un sólido. Después se hace un patrón circular y se corta el disco en bruto, que lleva la garganta toroidal.
@@ -154,6 +157,7 @@ No está copiado de ningún programa ni documento concreto. Se desarrolló para 
 - **Cortar con planos paralelos al eje del sinfín** (que son los paralelos al plano medio de la rueda) es un método clásico. En cada uno de esos planos, la sección del filete es una cremallera y la rueda engrana con ella como un piñón recto. Así lo plantean Earle Buckingham y Henry H. Ryffel en *Design of Worm and Spiral Gears* (Industrial Press, 1960; reeditado por Buckingham Associates). Lo resumen Stadtfeld y Errichello en [*Conjugate Gears*](https://www.geartechnology.com/conjugate-gears) (Gear Technology, 2023).
 - **Que el resultado sea exacto también lejos del centro** se razonó aquí: girar un helicoide alrededor de su eje equivale a desplazarlo a lo largo de ese eje. Un plano z = c contiene la dirección del eje del sinfín, así que la sección no cambia de forma, solo se desliza en X. La rueda gira alrededor de Z, perpendicular al plano, y el movimiento queda entero dentro del plano. Por eso la envolvente 2D de cada plano es la del engrane 3D real.
 - **La fórmula θ = (x + (y − R2)/x′)/R2** es la ecuación de engrane de cremallera y piñón: toca el punto del flanco cuya normal pasa por el punto primitivo. En la teoría general se escribe como "la normal es perpendicular a la velocidad relativa" (la ecuación de engrane de F. L. Litvin, en *Gear Geometry and Applied Theory*). La forma cerrada para este flanco se dedujo aquí.
+- **La trocoide del pie** viene de la teoría de la talla por generación: la esquina de la herramienta talla un pie que la envolvente sola no da (es la que socava los piñones de pocos dientes).
 - **La construcción** (perfiles por plano, solevación, patrón, corte y chaflán) es propia del proyecto. En Fusion se hace con splines y operaciones de la línea de tiempo; en FreeCAD, con OCCT ([sus diferencias](freecad/README.md#cómo-se-construye)).
 
 Lo que de verdad lo respalda no es una cita, sino la comprobación con los cuerpos reales del CAD: 0 mm³ de interferencia en 8 posiciones y un juego medido igual a la holgura pedida, en Fusion y en FreeCAD ([resultados](#-comprobación-del-engrane)).

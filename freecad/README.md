@@ -102,7 +102,7 @@ Lo que cambia es la construcción, que en FreeCAD se hace con OCCT:
 & "C:\Program Files\FreeCAD 1.1\bin\freecadcmd.exe" freecad\tests\run_tests.py
 ```
 
-Genera y comprueba cuatro juegos (unos 12 minutos en total), uno de ellos a izquierdas, con tramos lisos y taladros hexagonal y en D. Con la variable `WORMGEAR_OUT` deja además los STL en esa carpeta. Los resultados con FreeCAD 1.1.4 están en la [portada](../README.md#-comprobación-del-engrane): 0 mm³ de interferencia y un juego medido de 0.100 a 0.104 mm (pedido 0.100 mm) en los cuatro.
+Genera y comprueba cinco juegos (unos 30 minutos en total), uno de ellos con 20° y diente normal y otro a izquierdas, con tramos lisos y taladros hexagonal y en D. Con la variable `WORMGEAR_OUT` deja además los STL en esa carpeta. Los resultados con FreeCAD 1.1.4 están en la [portada](../README.md#-comprobación-del-engrane): 0 mm³ de interferencia y un juego medido de 0.100 a 0.104 mm (pedido 0.100 mm) en los cinco.
 
 ## Archivos
 

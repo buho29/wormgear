@@ -33,22 +33,34 @@ The data on the others comes from their documentation or their code, reviewed on
 
 GearWorkBench is the only one on the list that makes this kind of worm and its wheel in FreeCAD. So I ran it (code from 01/10/2026, in FreeCAD 1.1.4) and put its solids through the WormGear check: interference at 8 positions of one tooth and measured backlash.
 
-Set: module 1.5, 1 right-handed start, 30 teeth, worm pitch Ø 16 mm, 10 mm wide wheel, 0.1 mm backlash, 30° flank and full-depth tooth (addendum 1·m, dedendum 1.25·m). They cannot be compared at 45°, because GearWorkBench does not generate the thread and leaves the plain core. In WormGear I set "rim over tip" to 0: with this tooth at 30°, the default value leaves the teeth pointed. GearWorkBench leaves the wheel phase to the user (`WheelPhase`); I turned its worm in 72 steps of 5° and took the position with the least interference.
+Set: module 1.5, 1 right-handed start, 30 teeth, worm pitch Ø 16 mm, 10 mm wide wheel, 0.1 mm backlash and full-depth tooth (addendum 1·m, dedendum 1.25·m). I tested it with a 20° flank, which is the standard angle, and with 30°. They cannot be compared at 45°, because GearWorkBench does not generate the thread and leaves the plain core. In WormGear, at 30° I set "rim over tip" to 0: with this tooth, the default value leaves the teeth pointed. GearWorkBench leaves the wheel phase to the user (`WheelPhase`); I turned its worm in 72 steps of 5° and took the position with the least interference.
 
-| | Interference (8 positions) | Measured backlash (0.1 mm requested) |
-|---|---|---|
-| GearWorkBench | 0.6 to 1.0 mm³; no position without interference | 0 |
-| WormGear | 0 | 0.100 mm |
+| Flank | | Interference (8 positions) | Measured backlash (0.1 mm requested) |
+|---|---|---|---|
+| 20° | GearWorkBench | 7.0 to 7.3 mm³; no position without interference | 0 |
+| 20° | WormGear | 0 | 0.100 mm |
+| 30° | GearWorkBench | 0.6 to 1.0 mm³; no position without interference | 0 |
+| 30° | WormGear | 0 | 0.100 mm |
 
 The images are sections parallel to the wheel mid-plane, at the position with the least interference. The worm is in blue, the wheel in orange and the interference in red.
+
+### At 20°
+
+![GearWorkBench sections at 20°: 7.00 mm³ interference](img/comparativa_gwb_20_en.png)
+
+![WormGear sections at 20°: no interference](img/comparativa_wormgear_20_en.png)
+
+In GearWorkBench, the mid-plane is clear, but away from it one flank on each side runs into the worm. This is what the note above says: its wheel is a helical gear with a throat and, away from the mid-plane, it does not follow the worm. If the wheel is mirrored about its mid-plane, the interference goes away and 0.22 mm of backlash is left: its teeth seem to twist the opposite way to the worm helix. In WormGear, the clearance is the same across the whole width, and the root of the tooth is cut by the trochoid of the worm tip ([how it is computed](README.en.md#-how-the-wheel-is-computed)).
+
+### At 30°
 
 ![GearWorkBench sections at 30°: 1.01 mm³ interference](img/comparativa_gwb_30_en.png)
 
 ![WormGear sections at 30°: no interference](img/comparativa_wormgear_30_en.png)
 
-In GearWorkBench, the mid-plane is clear, but at ±2.5 mm one flank on each side runs into the worm. This is what the note above says: its wheel is a helical gear with a throat and, away from the mid-plane, it does not follow the worm. At 20° the same happens, with more interference (7 mm³). If the wheel is mirrored about its mid-plane, at 20° the interference goes away and 0.22 mm of backlash is left: its teeth seem to twist the opposite way to the worm helix. In WormGear, the clearance is the same across the whole width.
+The same happens, with less interference: in GearWorkBench, the mid-plane is clear and at ±2.5 mm one flank on each side runs into the worm.
 
-### The spikes at the tips
+#### The spikes at the tips
 
 At the tips of the GearWorkBench teeth there are small red spikes. They belong to the wheel, not the worm. With a 30° flank and a full-depth tooth, the two involutes of a tooth meet 24.22 mm from the axis and the tooth comes to a point. GearWorkBench (`generateToothProfile`, in `gearMath.py`) draws the flank with 12 points between the root (20.48 mm) and an outer radius of 27.11 mm, large so that the throat trims the tips afterwards; that puts one every 0.6 mm. When a point crosses to the other side of the tooth axis, it replaces it with a point on the axis at that same radius, 24.70 mm, and closes the tooth there. So the tooth goes on half a millimetre past where the involutes meet, like a needle.
 
@@ -56,7 +68,7 @@ At the tips of the GearWorkBench teeth there are small red spikes. They belong t
 
 In the mid-plane, the throat cuts at 24.23 mm and removes the needle. Away from it, the throat is higher (24.74 mm at ±2.5 mm and 26.13 mm at ±4.5 mm) and the whole needle is left. The worm leaves no room for it and rubs it: that is 0.11 of the 1.01 mm³ of interference. The rest, 0.90 mm³, is the flanks running into each other.
 
-Also, the GearWorkBench wheel at 30° is not a valid solid for FreeCAD (`isValid()` is false and `fix()` does not repair it), and FreeCAD warns about it in every boolean. So the measurements may be somewhat noisy.
+Also, the GearWorkBench wheel at 30° is not a valid solid for FreeCAD (`isValid()` is false and `fix()` does not repair it), and FreeCAD warns about it in every boolean; the 20° one is valid. So the measurements may be somewhat noisy.
 
 ## What WormGear does not do
 

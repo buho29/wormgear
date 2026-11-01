@@ -33,22 +33,34 @@ Los datos de los demás salen de su documentación o de su código, revisados el
 
 GearWorkBench es el único de la lista que hace este tipo de sinfín y su rueda en FreeCAD. Por eso lo he ejecutado (código del 01/10/2026, en FreeCAD 1.1.4) y he pasado sus sólidos por la comprobación de WormGear: interferencia en 8 posiciones de un diente y juego medido.
 
-Montaje: módulo 1.5, 1 entrada a derechas, 30 dientes, Ø primitivo del sinfín 16 mm, rueda de 10 mm de ancho, juego de 0.1 mm, flanco de 30° y diente normal (cabeza 1·m, pie 1.25·m). Con 45° no se pueden comparar, porque GearWorkBench no genera el filete y deja el núcleo liso. En WormGear he puesto "borde sobre la cabeza" a 0: con este diente a 30°, el valor por defecto deja los dientes en punta. GearWorkBench deja la fase de la rueda a mano (`WheelPhase`); he girado su sinfín en 72 pasos de 5° y he tomado la posición con menos choque.
+Montaje: módulo 1.5, 1 entrada a derechas, 30 dientes, Ø primitivo del sinfín 16 mm, rueda de 10 mm de ancho, juego de 0.1 mm y diente normal (cabeza 1·m, pie 1.25·m). Lo he probado con 20° de flanco, que es el ángulo normalizado, y con 30°. Con 45° no se pueden comparar, porque GearWorkBench no genera el filete y deja el núcleo liso. En WormGear, a 30° he puesto "borde sobre la cabeza" a 0: con este diente, el valor por defecto deja los dientes en punta. GearWorkBench deja la fase de la rueda a mano (`WheelPhase`); he girado su sinfín en 72 pasos de 5° y he tomado la posición con menos choque.
 
-| | Interferencia (8 posiciones) | Juego medido (pedido 0.1 mm) |
-|---|---|---|
-| GearWorkBench | De 0.6 a 1.0 mm³; ninguna posición sin choque | 0 |
-| WormGear | 0 | 0.100 mm |
+| Flanco | | Interferencia (8 posiciones) | Juego medido (pedido 0.1 mm) |
+|---|---|---|---|
+| 20° | GearWorkBench | De 7.0 a 7.3 mm³; ninguna posición sin choque | 0 |
+| 20° | WormGear | 0 | 0.100 mm |
+| 30° | GearWorkBench | De 0.6 a 1.0 mm³; ninguna posición sin choque | 0 |
+| 30° | WormGear | 0 | 0.100 mm |
 
 Las imágenes son cortes paralelos al plano medio de la rueda, en la posición con menos choque. El sinfín está en azul, la rueda en naranja y el choque en rojo.
+
+### Con 20°
+
+![Cortes de GearWorkBench a 20°: choque de 7.00 mm³](img/comparativa_gwb_20.png)
+
+![Cortes de WormGear a 20°: sin choque](img/comparativa_wormgear_20.png)
+
+En GearWorkBench, el plano medio está limpio, pero fuera de él choca un flanco a cada lado. Es lo que dice la nota de arriba: su rueda es un helicoidal con garganta y, lejos del plano medio, no sigue al sinfín. Si se espeja la rueda respecto a su plano medio, el choque desaparece y queda un juego de 0.22 mm: parece que sus dientes giran al revés que la hélice del sinfín. En WormGear, la holgura es la misma en todo el ancho, y el pie del diente lo talla la trocoide de la cabeza del sinfín ([cómo se calcula](README.md#-cómo-se-calcula-la-rueda)).
+
+### Con 30°
 
 ![Cortes de GearWorkBench a 30°: choque de 1.01 mm³](img/comparativa_gwb_30.png)
 
 ![Cortes de WormGear a 30°: sin choque](img/comparativa_wormgear_30.png)
 
-En GearWorkBench, el plano medio está limpio, pero a ±2.5 mm choca un flanco a cada lado. Es lo que dice la nota de arriba: su rueda es un helicoidal con garganta y, lejos del plano medio, no sigue al sinfín. Con 20° pasa lo mismo, con más choque (7 mm³). Si se espeja la rueda respecto a su plano medio, a 20° el choque desaparece y queda un juego de 0.22 mm: parece que sus dientes giran al revés que la hélice del sinfín. En WormGear, la holgura es la misma en todo el ancho.
+Pasa lo mismo, con menos choque: en GearWorkBench, el plano medio está limpio y a ±2.5 mm choca un flanco a cada lado.
 
-### Los piquitos de las puntas
+#### Los piquitos de las puntas
 
 En las puntas de los dientes de GearWorkBench se ven unos piquitos rojos. Son de la rueda, no del sinfín. Con 30° de flanco y diente normal, las dos involutas del diente se cortan a 24.22 mm del eje y el diente acaba en punta. GearWorkBench (`generateToothProfile`, en `gearMath.py`) dibuja el flanco con 12 puntos entre el fondo (20.48 mm) y un radio exterior de 27.11 mm, grande para que luego la garganta recorte las puntas; quedan uno cada 0.6 mm. Cuando un punto pasa al otro lado del eje del diente, lo cambia por un punto en el eje a ese mismo radio, 24.70 mm, y cierra ahí el diente. Así, el diente sigue medio milímetro más allá de donde se cortan las involutas, como una aguja.
 
@@ -56,7 +68,7 @@ En las puntas de los dientes de GearWorkBench se ven unos piquitos rojos. Son de
 
 En el plano medio, la garganta corta a 24.23 mm y se lleva la aguja. Lejos de él, la garganta está más alta (24.74 mm a ±2.5 mm y 26.13 mm a ±4.5 mm) y la aguja se queda entera. El sinfín no le deja sitio y la roza: son 0.11 de los 1.01 mm³ del choque. El resto, 0.90 mm³, es el choque de los flancos.
 
-Además, la rueda de GearWorkBench a 30° no es un sólido válido para FreeCAD (`isValid()` da falso y `fix()` no la arregla), y FreeCAD avisa en cada booleano. Por eso las medidas pueden tener algo de ruido.
+Además, la rueda de GearWorkBench a 30° no es un sólido válido para FreeCAD (`isValid()` da falso y `fix()` no la arregla), y FreeCAD avisa en cada booleano; la de 20° sí es válida. Por eso las medidas pueden tener algo de ruido.
 
 ## Lo que WormGear no hace
 

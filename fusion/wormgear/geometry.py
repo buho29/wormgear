@@ -186,34 +186,49 @@ def root_radius(q, c):
 
 def flank(q, c, sigma, n=40):
     """Puntos de un flanco del hueco, del círculo de fondo a R_OUT (radio creciente), remuestreados a n+1.
-    El flanco del cortador se prolonga por debajo de la cabeza y por encima del fondo (virtual): lo que sobra
-    se recorta con el círculo de fondo, y por fuera del borde de la rueda no hay material que cortar."""
+    El hueco es lo que barre el cortador: a cada radio, el flanco está donde más entra en el diente, entre
+    - la envolvente del flanco del cortador, desde la cabeza; por encima del fondo se prolonga (virtual),
+      porque por fuera del borde de la rueda no hay material que cortar;
+    - la trocoide de la esquina de la cabeza, que es la que talla el pie del diente. Con poco ángulo de flanco
+      la envolvente no baja hasta el fondo y, sin la trocoide, la cresta del sinfín rozaba ahí la rueda.
+    La esquina está en y = A - √(hob_tip² - c²) = rr, así que su trocoide sale del círculo de fondo: con
+    X = x_esquina - R2·θ, el punto está a radio √(X² + rr²) y a un ángulo atan2(X, rr) + θ desde +Y."""
     rr = root_radius(q, c)
-    u0 = -math.sqrt(q['hob_tip'] ** 2 - c * c) - 1.0
+    span = q['R_OUT'] - rr
+    u0 = -math.sqrt(q['hob_tip'] ** 2 - c * c)   # cabeza del cortador
+    x0 = q['lead'] * math.atan2(-c, -u0) / (2 * math.pi) + sigma * hw(q, q['hob_tip'], q['backlash'] / 2)
+    # radios más juntos cerca del fondo, donde la trocoide cambia deprisa de ángulo
+    N = 400
+    radii = [rr + span * (k / N) ** 2 for k in range(N + 1)]
+    best = []
+    for r in radii:
+        X = sigma * math.sqrt(max(r * r - rr * rr, 0.0))
+        best.append(math.atan2(X, rr) + (x0 - X) / q['R2'])
     u1 = -0.2
-    raw = []
     steps = 400
+    prev = None
+    found = 0
     for i in range(steps + 1):
         u = u0 + (u1 - u0) * i / steps
         try:
             e = envelope_point(q, c, u, sigma)
         except ZeroDivisionError:   # flanco paralelo a la rodadura: ese punto no engendra nada
+            prev = None
             continue
-        raw.append((math.hypot(*e), e))
-    out = []
-    for (ra, ea), (rb, eb) in zip(raw, raw[1:]):
-        if rb <= ra:
-            continue
-        for rt in (rr, q['R_OUT']):
-            if ra < rt <= rb:
-                t = (rt - ra) / (rb - ra)
-                out.append((rt, (ea[0] + t * (eb[0] - ea[0]), ea[1] + t * (eb[1] - ea[1]))))
-        if rr < rb < q['R_OUT']:
-            out.append((rb, eb))
-    out.sort(key=lambda v: v[0])
-    pts = [v[1] for v in out]
-    if len(pts) < 2:
+        cur = (math.hypot(*e), angle_from_y(e))
+        found += 1
+        if prev is not None and cur[0] != prev[0]:
+            lo, hi = min(prev[0], cur[0]), max(prev[0], cur[0])
+            k0 = math.ceil(N * math.sqrt(max(lo - rr, 0.0) / span))
+            k1 = min(N, math.floor(N * math.sqrt(max(hi - rr, 0.0) / span)))
+            for k in range(k0, k1 + 1):
+                a = prev[1] + (radii[k] - prev[0]) / (cur[0] - prev[0]) * (cur[1] - prev[1])
+                if sigma * a > sigma * best[k]:
+                    best[k] = a
+        prev = cur
+    if found < 2:
         raise ValueError(tr('no se pudo calcular el flanco en z=%.2f') % c)
+    pts = [(r * math.sin(a), r * math.cos(a)) for r, a in zip(radii, best)]
     L = [0.0]
     for a, b in zip(pts, pts[1:]):
         L.append(L[-1] + math.dist(a, b))

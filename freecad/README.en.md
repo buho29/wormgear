@@ -102,7 +102,7 @@ What changes is the construction, which in FreeCAD is done with OCCT:
 & "C:\Program Files\FreeCAD 1.1\bin\freecadcmd.exe" freecad\tests\run_tests.py
 ```
 
-It generates and checks four sets (about 12 minutes in total), one of them left-handed, with plain ends and hexagonal and D bores. With the `WORMGEAR_OUT` variable it also leaves the STLs in that folder. The results with FreeCAD 1.1.4 are on the [front page](../README.en.md#-mesh-check): 0 mm³ of interference and a measured backlash of 0.100 to 0.104 mm (requested 0.100 mm) in all four.
+It generates and checks five sets (about 30 minutes in total), one of them at 20° with a full-depth tooth and another left-handed, with plain ends and hexagonal and D bores. With the `WORMGEAR_OUT` variable it also leaves the STLs in that folder. The results with FreeCAD 1.1.4 are on the [front page](../README.en.md#-mesh-check): 0 mm³ of interference and a measured backlash of 0.100 to 0.104 mm (requested 0.100 mm) in all five.
 
 ## Files
 
