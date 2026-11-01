@@ -4,7 +4,7 @@
 
 What the best-known worm and wheel generators for Fusion 360, FreeCAD, Onshape, Inventor and OpenSCAD do, next to WormGear (v1.2). It is meant to help you pick the one that best fits what you need.
 
-The data on the others comes from their documentation or their code, reviewed on 31/10/2026; I have not run them, and they may have changed. "–" means their documentation does not mention it.
+The data on the others comes from their documentation or their code, reviewed on 31/10/2026; I have not run them, except GearWorkBench in the [test below](#test-with-the-same-set-gearworkbench-and-wormgear), and they may have changed. "–" means their documentation does not mention it.
 
 ## Table
 
@@ -22,12 +22,41 @@ The data on the others comes from their documentation or their code, reviewed on
 
 ## Notes
 
-- **GearWorkBench** has the same kind of worm, with a straight flank in the axial section. Its wheel is a helical gear with a throat, not the envelope: it meshes well in the mid-plane and, away from it, the flanks do not follow the worm exactly. It also makes many other kinds of gears. LGPL-2.1 license.
+- **GearWorkBench** has the same kind of worm, with a straight flank in the axial section. Its wheel is a helical gear with a throat, not the envelope: it meshes well in the mid-plane and, away from it, the flanks do not follow the worm and run into it ([test](#test-with-the-same-set-gearworkbench-and-wormgear)). It also makes many other kinds of gears. LGPL-2.1 license.
 - **freecad.gears** (FCGear) is the most used gear module in FreeCAD. Of this pair, it only makes the worm.
 - **Helical Gear+** is free on the Autodesk App Store. Its description says it makes "non-enveloping" worms and wheels: the wheel is a plain helical gear and the contact with the worm is almost a point. For light loads that is often enough.
 - **Worm Gear FS** (an Onshape FeatureScript by Younseo Lee) is recent: v1 and v2 were posted on the Onshape forum in October. v2 adds globoid worms and estimates the efficiency and whether the wheel can drive the worm. It also makes a double worm, with two worms on opposite sides of the wheel.
 - **Inventor** (Design Accelerator) is the only one with a strength calculation. Its help says the tooth curve is simplified.
 - **BOSL2** generates the enveloping wheel by simulating the hobbing motion, with crowning so the edges are not loaded. Its documentation warns that, away from the mid-plane, the teeth come to a point and the clearance is not uniform across the width. In 2024, on the OpenSCAD mailing list, its worm gears were said to be broken; the current documentation describes the new calculation.
+
+## Test with the same set: GearWorkBench and WormGear
+
+GearWorkBench is the only one on the list that makes this kind of worm and its wheel in FreeCAD. So I ran it (code from 01/10/2026, in FreeCAD 1.1.4) and put its solids through the WormGear check: interference at 8 positions of one tooth and measured backlash.
+
+Set: module 1.5, 1 right-handed start, 30 teeth, worm pitch Ø 16 mm, 10 mm wide wheel, 0.1 mm backlash, 30° flank and full-depth tooth (addendum 1·m, dedendum 1.25·m). They cannot be compared at 45°, because GearWorkBench does not generate the thread and leaves the plain core. In WormGear I set "rim over tip" to 0: with this tooth at 30°, the default value leaves the teeth pointed. GearWorkBench leaves the wheel phase to the user (`WheelPhase`); I turned its worm in 72 steps of 5° and took the position with the least interference.
+
+| | Interference (8 positions) | Measured backlash (0.1 mm requested) |
+|---|---|---|
+| GearWorkBench | 0.6 to 1.0 mm³; no position without interference | 0 |
+| WormGear | 0 | 0.100 mm |
+
+The images are sections parallel to the wheel mid-plane, at the position with the least interference. The worm is in blue, the wheel in orange and the interference in red.
+
+![GearWorkBench sections at 30°: 1.01 mm³ interference](img/comparativa_gwb_30_en.png)
+
+![WormGear sections at 30°: no interference](img/comparativa_wormgear_30_en.png)
+
+In GearWorkBench, the mid-plane is clear, but at ±2.5 mm one flank on each side runs into the worm. This is what the note above says: its wheel is a helical gear with a throat and, away from the mid-plane, it does not follow the worm. At 20° the same happens, with more interference (7 mm³). If the wheel is mirrored about its mid-plane, at 20° the interference goes away and 0.22 mm of backlash is left: its teeth seem to twist the opposite way to the worm helix. In WormGear, the clearance is the same across the whole width.
+
+### The spikes at the tips
+
+At the tips of the GearWorkBench teeth there are small red spikes. They belong to the wheel, not the worm. With a 30° flank and a full-depth tooth, the two involutes of a tooth meet 24.22 mm from the axis and the tooth comes to a point. GearWorkBench (`generateToothProfile`, in `gearMath.py`) draws the flank with 12 points between the root (20.48 mm) and an outer radius of 27.11 mm, large so that the throat trims the tips afterwards; that puts one every 0.6 mm. When a point crosses to the other side of the tooth axis, it replaces it with a point on the axis at that same radius, 24.70 mm, and closes the tooth there. So the tooth goes on half a millimetre past where the involutes meet, like a needle.
+
+![Tip of a GearWorkBench tooth at z = -2.5 mm: the needle goes past where the involutes meet](img/comparativa_gwb_punta_en.png)
+
+In the mid-plane, the throat cuts at 24.23 mm and removes the needle. Away from it, the throat is higher (24.74 mm at ±2.5 mm and 26.13 mm at ±4.5 mm) and the whole needle is left. The worm leaves no room for it and rubs it: that is 0.11 of the 1.01 mm³ of interference. The rest, 0.90 mm³, is the flanks running into each other.
+
+Also, the GearWorkBench wheel at 30° is not a valid solid for FreeCAD (`isValid()` is false and `fix()` does not repair it), and FreeCAD warns about it in every boolean. So the measurements may be somewhat noisy.
 
 ## What WormGear does not do
 
@@ -46,7 +75,7 @@ The WormGear summary gives the efficiency greased (μ 0.1) and dry (μ 0.3), and
 
 ## Sources
 
-- [GearWorkBench](https://github.com/iplayfast/GearWorkBench): code of `wormGear.py` and `globoidWormGear.py`.
+- [GearWorkBench](https://github.com/iplayfast/GearWorkBench): code of `wormGear.py`, `globoidWormGear.py` and `gearMath.py`, and the test above with commit `e912ccf`.
 - [freecad.gears](https://github.com/looooo/freecad.gears): code of `freecad/gears/wormgear.py`.
 - [Helical Gear+](https://github.com/phossystems/HelicalGearPlus) and the [Autodesk App Store](https://apps.autodesk.com/FUSION/en/Home).
 - [Worm Gear FS v1](https://forum.onshape.com/discussion/31942/custom-feature-worm-gear) and [v2.0](https://forum.onshape.com/discussion/31969/custom-feature-worm-gear-v2-0-now-supporting-globoid-worm-gears), on the Onshape forum.
