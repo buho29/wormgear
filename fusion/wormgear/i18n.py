@@ -165,8 +165,9 @@ EN = {
     'El hueco del sinfín se cierra en el fondo: baja el pie o el flanco.':
         'The worm gap closes at the root: reduce the dedendum or the flank angle.',
     'Fondo del hueco del sinfín de %.2f mm.': 'Worm gap root of %.2f mm.',
-    'Con el sinfín de pie, la cara de abajo del filete queda a %.0f° de voladizo.':
-        'With the worm standing, the underside of the thread is a %.0f° overhang.',
+    'Con el sinfín de pie, la cara de abajo del filete queda a %.0f° de la horizontal '
+    '(el umbral de voladizo del laminador; en Cura, %.0f°).':
+        'With the worm standing, the underside of the thread is at %.0f° from the horizontal (the slicer overhang threshold; in Cura, %.0f°).',
     'Los dientes no llegan a las caras: el sinfín solo toca la rueda en %.1f mm de ancho '
     '(estrecha la rueda o agranda el sinfín).':
         'The teeth do not reach the faces: the worm only touches %.1f mm of the wheel width '

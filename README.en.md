@@ -56,6 +56,30 @@ The three wheels have the same set: m1.5, 30 teeth, 1 start, 20° flank and full
 
 The measurements at 8 positions and the 30° test are in the [comparison](comparativa.en.md#test-with-the-same-set-gearworkbench-and-wormgear).
 
+## 📐 Which flank angle to choose
+
+The flank angle is the **pressure angle** in the axial section of the worm (the one in the standards, usually 20°). It is called flank here because that is what shows when printing: with the worm standing, the underside of the thread is tilted that same angle above the horizontal, and it is the number to compare with the slicer's overhang threshold (PrusaSlicer, OrcaSlicer, Bambu Studio). In Cura, which measures it from the vertical, it is 90° minus the flank.
+
+Besides the overhang, the flank sets how efficient the gear is and how hard the wheel pushes against the worm.
+
+| Flank | Efficiency, 1 start (greased / dry) | Efficiency, 2 starts (greased / dry) | Radial force | Self-locks up to (greased / dry) |
+|---|---|---|---|---|
+| 20° | 46 % / 22 % | 63 % / 35 % | 1× | 6.1° / 17.7° lead angle |
+| 30° | 44 % / 21 % | 61 % / 33 % | 1.6× | 6.6° / 19.1° lead angle |
+| 45° (default) | 39 % / 17 % | 56 % / 28 % | 2.7× | 8.0° / 22.9° lead angle |
+
+Default set (m1.5, 30 teeth, worm pitch Ø 16 mm): 5.4° lead angle with 1 start and 10.6° with 2. Greased is μ 0.1 and dry, μ 0.3. The radial force, which pushes the worm away from the wheel, is at the same torque and relative to 20°.
+
+- **Efficiency:** from 20° to 45° it drops about 7 points (from 46 % to 39 % with 1 start, greased). The number of starts matters much more: with 2, the lead angle goes from 5.4° to 10.6° and the efficiency rises about 16 points, at the cost of half the reduction and no self-locking when greased.
+- **Radial force:** at 45° it is almost three times that at 20°. The shafts and their supports have to take it; if they give, the mesh opens.
+- **Self-locking:** with 1 start, the wheel cannot drive the worm with any flank, not even greased. With 2 starts it only self-locks dry. With vibration, a self-locking worm can still back-drive.
+
+Recommendation:
+- **PLA or PETG: 30°.** With the part cooling fan, they handle faces at 30° from the horizontal well without supports. It is a little more efficient than 45° and the radial force drops by 40 %.
+- **ABS or ASA: 45°.** They are printed with little fan, because they shrink and crack if they cool quickly, and so faces flatter than 45° come out badly.
+
+These are estimates: the friction of printed plastic varies a lot. There is more detail in the [comparison](comparativa.en.md#efficiency-with-a-45-flank).
+
 ## 🔧 Parameters
 
 They are the same in both versions. In Fusion they are in the dialog; in FreeCAD they are properties of the object.

@@ -56,6 +56,30 @@ Las tres ruedas tienen el mismo montaje: m1.5, 30 dientes, 1 entrada, 20° de fl
 
 Las medidas en 8 posiciones y la prueba a 30° están en la [comparativa](comparativa.md#prueba-con-el-mismo-montaje-gearworkbench-y-wormgear).
 
+## 📐 Qué ángulo de flanco elegir
+
+El ángulo de flanco es el **ángulo de presión** en la sección axial del sinfín (el de las normas, que suele ser 20°). Aquí se llama flanco porque es lo que se ve al imprimir: con el sinfín de pie, la cara de abajo del filete queda inclinada ese mismo ángulo sobre la horizontal, y es el número que se compara con el umbral de voladizo del laminador (PrusaSlicer, OrcaSlicer, Bambu Studio). En Cura, que lo mide desde la vertical, es 90° menos el flanco.
+
+Además del voladizo, el flanco decide cuánto rinde el engrane y cuánto empuja la rueda contra el sinfín.
+
+| Flanco | Rendimiento, 1 entrada (grasa / seco) | Rendimiento, 2 entradas (grasa / seco) | Fuerza radial | Se autobloquea hasta (grasa / seco) |
+|---|---|---|---|---|
+| 20° | 46 % / 22 % | 63 % / 35 % | 1× | 6.1° / 17.7° de hélice |
+| 30° | 44 % / 21 % | 61 % / 33 % | 1.6× | 6.6° / 19.1° de hélice |
+| 45° (por defecto) | 39 % / 17 % | 56 % / 28 % | 2.7× | 8.0° / 22.9° de hélice |
+
+Juego por defecto (m1.5, 30 dientes, Ø primitivo del sinfín 16 mm): hélice de 5.4° con 1 entrada y de 10.6° con 2. Grasa es μ 0.1 y seco, μ 0.3. La fuerza radial, la que separa el sinfín de la rueda, va con el mismo par y relativa a 20°.
+
+- **Rendimiento:** de 20° a 45° baja unos 7 puntos (del 46 % al 39 % con 1 entrada y grasa). Cuentan mucho más las entradas: con 2, la hélice pasa de 5.4° a 10.6° y el rendimiento sube unos 16 puntos, a cambio de reducir la mitad y de no autobloquearse con grasa.
+- **Fuerza radial:** con 45° es casi el triple que con 20°. Los ejes y sus apoyos tienen que aguantarla; si ceden, el engrane se abre.
+- **Autobloqueo:** con 1 entrada, la rueda no puede mover el sinfín con ningún flanco, ni siquiera con grasa. Con 2 entradas solo se autobloquea en seco. Con vibraciones, un sinfín autobloqueante puede volver atrás.
+
+Recomendación:
+- **PLA o PETG: 30°.** Con el ventilador de capa, aguantan bien caras a 30° de la horizontal sin soportes. Rinde un poco más que 45° y la fuerza radial baja un 40 %.
+- **ABS o ASA: 45°.** Se imprimen con poco ventilador, porque si se enfrían deprisa encogen y se agrietan, y así las caras más tumbadas de 45° salen mal.
+
+Son estimaciones: el rozamiento del plástico impreso varía mucho. Hay más detalle en la [comparativa](comparativa.md#rendimiento-con-flanco-de-45).
+
 ## 🔧 Parámetros
 
 Son los mismos en las dos versiones. En Fusion salen en el diálogo; en FreeCAD son propiedades del objeto, con el nombre en inglés.

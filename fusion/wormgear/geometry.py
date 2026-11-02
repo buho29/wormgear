@@ -422,7 +422,8 @@ def check_params(prm):
     elif gap_root < 0.3:
         warns.append(tr('Fondo del hueco del sinfín de %.2f mm.') % gap_root)
     if q['flank_deg'] < 45:
-        warns.append(tr('Con el sinfín de pie, la cara de abajo del filete queda a %.0f° de voladizo.') % (90 - q['flank_deg']))
+        warns.append(tr('Con el sinfín de pie, la cara de abajo del filete queda a %.0f° de la horizontal '
+                     '(el umbral de voladizo del laminador; en Cura, %.0f°).') % (q['flank_deg'], 90 - q['flank_deg']))
     if q['wheel_width'] / 2 > q['c_touch']:
         warns.append(tr('Los dientes no llegan a las caras: el sinfín solo toca la rueda en %.1f mm de ancho '
                      '(estrecha la rueda o agranda el sinfín).') % (2 * q['c_touch']))
