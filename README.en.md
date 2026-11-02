@@ -73,6 +73,7 @@ Default set (m1.5, 30 teeth, worm pitch Ø 16 mm): 5.4° lead angle with 1 start
 - **Efficiency:** from 20° to 45° it drops about 7 points (from 46 % to 39 % with 1 start, greased). The number of starts matters much more: with 2, the lead angle goes from 5.4° to 10.6° and the efficiency rises about 16 points, at the cost of half the reduction and no self-locking when greased.
 - **Radial force:** at 45° it is almost three times that at 20°. The shafts and their supports have to take it; if they give, the mesh opens.
 - **Self-locking:** with 1 start, the wheel cannot drive the worm with any flank, not even greased. With 2 starts it only self-locks dry. With vibration, a self-locking worm can still back-drive.
+- **Is higher efficiency better?** Almost always: less heat (PLA softens around 55–60 °C), less wear and a smaller motor is enough. Except when it has to hold the load while stopped, like a lift or a lid: a self-locking worm is less than 50 % efficient, and there 1 start is the way to go.
 
 Recommendation:
 - **PLA or PETG: 30°.** With the part cooling fan, they handle faces at 30° from the horizontal well without supports. It is a little more efficient than 45° and the radial force drops by 40 %.

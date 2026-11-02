@@ -73,6 +73,7 @@ Juego por defecto (m1.5, 30 dientes, Ø primitivo del sinfín 16 mm): hélice de
 - **Rendimiento:** de 20° a 45° baja unos 7 puntos (del 46 % al 39 % con 1 entrada y grasa). Cuentan mucho más las entradas: con 2, la hélice pasa de 5.4° a 10.6° y el rendimiento sube unos 16 puntos, a cambio de reducir la mitad y de no autobloquearse con grasa.
 - **Fuerza radial:** con 45° es casi el triple que con 20°. Los ejes y sus apoyos tienen que aguantarla; si ceden, el engrane se abre.
 - **Autobloqueo:** con 1 entrada, la rueda no puede mover el sinfín con ningún flanco, ni siquiera con grasa. Con 2 entradas solo se autobloquea en seco. Con vibraciones, un sinfín autobloqueante puede volver atrás.
+- **¿Más rendimiento es mejor?** Casi siempre: menos calor (el PLA se ablanda hacia los 55–60 °C), menos desgaste y basta un motor más pequeño. Salvo si tiene que sostener la carga parado, como un elevador o una tapa: un sinfín que se autobloquea rinde menos del 50 %, y ahí conviene 1 entrada.
 
 Recomendación:
 - **PLA o PETG: 30°.** Con el ventilador de capa, aguantan bien caras a 30° de la horizontal sin soportes. Rinde un poco más que 45° y la fuerza radial baja un 40 %.
