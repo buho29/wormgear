@@ -48,11 +48,9 @@ The default gear set, mounted on a base with columns and caps locked with filame
 
 ### A short story
 
-Years ago I made [this demo](https://www.thingiverse.com/thing:3353316) in SolidWorks. I spent weeks of frustration getting a worm and a wheel to turn without colliding, and even then I could not touch a single parameter without breaking everything. The only clear idea I took away was that the wheel had to be *machined* with the worm. I did not know how to do that either.
+Years ago I made [this demo](https://www.thingiverse.com/thing:3353316) in SolidWorks. I spent weeks of frustration getting a worm and a wheel to turn without colliding, and even then I could not touch a single parameter without breaking everything. The only clear idea I took away was that the wheel had to be *machined* with the worm. But in my early days I did not know how to do that either.
 
-Years later, in another project, Claude assured me it could make me a working worm gear. This repo is what came out of it: truly parametric, in Fusion and in FreeCAD, with a new demo that prints and turns. And in the end the wheel did not even need machining, because its teeth come from a closed formula.
-
-I still can't believe it.
+Today, in another project, an AI assured me it could make me a working worm gear, and I didn't believe it. This repo is what came out of it: truly parametric, in Fusion and in FreeCAD, with a new demo that prints and turns. And in the end the wheel did not even need machining, because its teeth come from a closed formula.
 
 ## ⚖️ Compared with other ways of drawing the wheel
 

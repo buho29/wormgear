@@ -48,11 +48,9 @@ El engrane por defecto, montado en una base con columnas y tapas que se bloquean
 
 ### Una pequeña historia
 
-Hace años hice [esta demo](https://www.thingiverse.com/thing:3353316) en SolidWorks. Me pasé semanas frustrado para conseguir un sinfín y una rueda que giraran sin chocar, y aun así no podía tocar ni un parámetro sin que se rompiera todo. De aquello solo saqué una idea en claro: la rueda había que *mecanizarla* con el sinfín. Tampoco sabía cómo hacerlo.
+Hace años hice [esta demo](https://www.thingiverse.com/thing:3353316) en SolidWorks. Me pasé semanas frustrado para conseguir un sinfín y una rueda que giraran sin chocar, y aun así no podía tocar ni un parámetro sin que se rompiera todo. De aquello solo saqué una idea en claro: la rueda había que *mecanizarla* con el sinfín. Pero en mis inicios tampoco sabía cómo hacerlo.
 
-Años después, en otro proyecto, Claude me aseguró que podía hacerme un sinfín funcional. De ahí salió este repo: paramétrico de verdad, en Fusion y en FreeCAD, y con una demo nueva que se imprime y gira. Y al final ni siquiera hizo falta mecanizar la rueda, porque sus dientes salen de una fórmula cerrada.
-
-Todavía no me lo creo.
+Hoy, en otro proyecto, una IA me aseguró que podía hacerme un sinfín funcional, y no le creí. De ahí salió este repo: paramétrico de verdad, en Fusion y en FreeCAD, y con una demo nueva que se imprime y gira. Y al final ni siquiera hizo falta mecanizar la rueda, porque sus dientes salen de una fórmula cerrada.
 
 ## ⚖️ Frente a otras formas de dibujar la rueda
 

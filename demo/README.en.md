@@ -18,17 +18,17 @@ The worm and the wheel are each printed **in one piece with their shafts**, whic
 
 ## 🧩 Parts
 
-The STEP files in [`step/`](step/) are already in their printing orientation, with the bed at z = 0. They need no slicer supports.
+The STEP files in [`3d files/`](3d%20files/) are already in their printing orientation, with the bed at z = 0. They need no slicer supports.
 
 | File | Qty | How to print |
 |---|---|---|
-| [`base.step`](step/base.step) | 1 | Plate on the bed. |
-| [`tapa.step`](step/tapa.step) (cap) | 4 | As mounted. The four caps are identical. |
-| [`sinfin.step`](step/sinfin.step) (worm) | 1 | Standing, knob down. |
-| [`rueda.step`](step/rueda.step) + [`soporte_rueda.step`](step/soporte_rueda.step) (wheel + support) | 1 | Standing on the tip of the shaft on the recessed side, with its support. Load both files together as one object: they are already in place. |
+| [`base.step`](3d%20files/base.step) | 1 | Plate on the bed. |
+| [`tapa.step`](3d%20files/tapa.step) (cap) | 4 | As mounted. The four caps are identical. |
+| [`sinfin.step`](3d%20files/sinfin.step) (worm) | 1 | Standing, knob down. |
+| [`rueda.step`](3d%20files/rueda.step) + [`soporte_rueda.step`](3d%20files/soporte_rueda.step) (wheel + support) | 1 | Standing on the tip of the shaft on the recessed side, with its support. Load both files together as one object: they are already in place. |
 | 1.75 mm filament | 4 | 19 mm pins. |
 
-[`conjunto.step`](step/conjunto.step) is the assembled demo, without the support.
+[`conjunto.step`](3d%20files/conjunto.step) is the assembled demo, without the support.
 
 ![Parts in printing orientation](img/piezas.png)
 
