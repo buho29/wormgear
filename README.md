@@ -40,6 +40,20 @@ La matemática está en `wormgear/geometry.py`, que no depende de ningún CAD y 
 - 🌐 **En castellano o en inglés:** el diálogo, las propiedades, los avisos y los nombres de las piezas salen en castellano si Fusion o FreeCAD lo están, y en inglés con cualquier otro idioma.
 - 🖨️ **Pensado para imprimir:** con los valores por defecto (flanco de 45° y diente bajo), el sinfín se imprime de pie y la rueda tumbada, los dos sin soportes.
 
+## 🎡 Demo para imprimir
+
+<img src="demo/img/conjunto.png" alt="Demo de WormGear montada" width="480">
+
+El engrane por defecto, montado en una base con columnas y tapas que se bloquean con filamento. El sinfín y la rueda se imprimen de una pieza con sus ejes, y al girar el pomo gira la rueda. Las piezas, cómo se imprimen y cómo se monta están en la [demo](demo/README.md).
+
+### Una pequeña historia
+
+Hace años hice [esta demo](https://www.thingiverse.com/thing:3353316) en SolidWorks. Me pasé semanas frustrado para conseguir un sinfín y una rueda que giraran sin chocar, y aun así no podía tocar ni un parámetro sin que se rompiera todo. De aquello solo saqué una idea en claro: la rueda había que *mecanizarla* con el sinfín. Tampoco sabía cómo hacerlo.
+
+Años después, en otro proyecto, Claude me aseguró que podía hacerme un sinfín funcional. De ahí salió este repo: paramétrico de verdad, en Fusion y en FreeCAD, y con una demo nueva que se imprime y gira. Y al final ni siquiera hizo falta mecanizar la rueda, porque sus dientes salen de una fórmula cerrada.
+
+Todavía no me lo creo.
+
 ## ⚖️ Frente a otras formas de dibujar la rueda
 
 Las tres ruedas tienen el mismo montaje: m1.5, 30 dientes, 1 entrada, 20° de flanco y diente normal. Se ven en cortes paralelos al plano medio, con el sinfín en azul, la rueda en naranja y el choque en rojo, en la posición con menos choque.
@@ -211,6 +225,7 @@ Lo que de verdad lo respalda no es una cita, sino la comprobación con los cuerp
 |---|---|
 | [`fusion/`](fusion/README.md) | El add-in de Fusion 360: código, instalador y su README. |
 | [`freecad/`](freecad/README.md) | El banco de trabajo de FreeCAD: código, pruebas y su README. |
+| [`demo/`](demo/README.md) | La demo para imprimir: el script de Fusion que la genera, los STEP y su README. |
 | `img/` | Los diagramas del cálculo. `img/diagramas.py` los dibuja con matplotlib a partir de `fusion/wormgear/geometry.py`. |
 | `package.xml` | Los metadatos para el gestor de complementos de FreeCAD. |
 | [`comparativa.md`](comparativa.md) | Qué hacen otros generadores de sinfín y rueda (Fusion, FreeCAD, Onshape, Inventor, OpenSCAD). |

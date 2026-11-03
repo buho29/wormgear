@@ -1,0 +1,10 @@
+{
+  "autodeskProduct": "Fusion360",
+  "type": "script",
+  "author": "buho29",
+  "description": {
+    "": "Printable WormGear demo: worm with crank, wheel and printed snap-in axles. / Demo imprimible de WormGear: sinfín con manivela, rueda y ejes impresos a presión."
+  },
+  "supportedOS": "windows|mac",
+  "editEnabled": true
+}

@@ -40,6 +40,20 @@ The math lives in `wormgear/geometry.py`, which does not depend on any CAD and i
 - 🌐 **Spanish or English:** the dialog, properties, warnings and part names are in Spanish if Fusion or FreeCAD is in Spanish, and in English for any other language.
 - 🖨️ **Made for printing:** with the defaults (45° flank and stub tooth), the worm prints standing and the wheel lying flat, both without supports.
 
+## 🎡 Printable demo
+
+<img src="demo/img/conjunto.png" alt="Assembled WormGear demo" width="480">
+
+The default gear set, mounted on a base with columns and caps locked with filament. The worm and the wheel are each printed in one piece with their shafts, and turning the knob turns the wheel. The parts, how to print them and how to assemble them are in the [demo](demo/README.en.md).
+
+### A short story
+
+Years ago I made [this demo](https://www.thingiverse.com/thing:3353316) in SolidWorks. I spent weeks of frustration getting a worm and a wheel to turn without colliding, and even then I could not touch a single parameter without breaking everything. The only clear idea I took away was that the wheel had to be *machined* with the worm. I did not know how to do that either.
+
+Years later, in another project, Claude assured me it could make me a working worm gear. This repo is what came out of it: truly parametric, in Fusion and in FreeCAD, with a new demo that prints and turns. And in the end the wheel did not even need machining, because its teeth come from a closed formula.
+
+I still can't believe it.
+
 ## ⚖️ Compared with other ways of drawing the wheel
 
 The three wheels have the same set: m1.5, 30 teeth, 1 start, 20° flank and full-depth tooth. They are shown in sections parallel to the mid-plane, with the worm in blue, the wheel in orange and the interference in red, at the position with the least interference.
@@ -211,6 +225,7 @@ What really backs it up is not a citation, but the check with the real CAD bodie
 |---|---|
 | [`fusion/`](fusion/README.en.md) | The Fusion 360 add-in: code, installer and its README. |
 | [`freecad/`](freecad/README.en.md) | The FreeCAD workbench: code, tests and its README. |
+| [`demo/`](demo/README.en.md) | The printable demo: the Fusion script that builds it, the STEP files and its README. |
 | `img/` | The diagrams of the calculation. `img/diagramas.py` draws them with matplotlib from `fusion/wormgear/geometry.py`. |
 | `package.xml` | The metadata for the FreeCAD Addon Manager. |
 | [`comparativa.en.md`](comparativa.en.md) | What other worm gear generators do (Fusion, FreeCAD, Onshape, Inventor, OpenSCAD). |
