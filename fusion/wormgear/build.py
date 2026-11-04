@@ -7,6 +7,7 @@
 # - Taladros: boceto con geometry.bore_outline y extrusión de corte a través de todo (editable).
 # Todo queda en un grupo de la línea de tiempo.
 # En un diseño de ensamblaje cada pieza va en su componente (con junta de giro); en uno de pieza, como cuerpos.
+# Progreso: build(..., on_step=f) avisa con f(fracción, texto) antes de cada etapa; este módulo no sabe quién escucha.
 import math
 import adsk.core
 import adsk.fusion
@@ -15,6 +16,18 @@ from . import geometry as G
 from .i18n import tr
 
 MM = 0.1   # Fusion trabaja en cm
+# peso de cada parte en la barra de progreso: segundos medidos con 40 mm de filete y m1.5, 30:1. Es aproximado:
+# lo que más pesa del sinfín son sus dos hélices, y crecen mucho con los puntos (3 s con 335, 14 s con 540)
+STEP_WEIGHTS = {'worm': 8.6, 'wheel': 5.5, 'joints': 0.4}
+
+
+def span(on_step, start, end):
+    """Aviso de progreso de un tramo: step(f, texto) con f de 0 a 1 llega a on_step como fracción entre start y end.
+    Sin on_step no hace nada."""
+    def step(f, text=None):
+        if on_step:
+            on_step(start + (end - start) * f, text)
+    return step
 
 
 def P(x, y, z):
@@ -48,7 +61,7 @@ def wheel_rotation(theta):
 
 # ---------------------------------------------------------------- sinfín
 
-def _thread_body(comp, q, extra, tip, length):
+def _thread_body(comp, q, extra, tip, length, step=span(None, 0, 1)):
     """Barre un filete y devuelve una copia temporal (borra los bocetos y el barrido)."""
     lead = q['lead']
     h = q['hand']   # a izquierdas, x -> -x
@@ -67,7 +80,9 @@ def _thread_body(comp, q, extra, tip, length):
             pts.add(P(h * lead * (t - math.pi) / (2 * math.pi), q['A'] + r * math.cos(t), r * math.sin(t)))
         return sk.sketchCurves.sketchFittedSplines.add(pts)
 
+    step(0.0, tr('Sinfín: dibujando la hélice (1 de 2)…'))
     path_curve = helix(q['R1'])
+    step(0.4, tr('Sinfín: dibujando la hélice (2 de 2)…'))
     rail_curve = helix(tip)          # guía por el centro de la cresta
     sk.isComputeDeferred = False
     # perfil axial: trapecio de flancos rectos, recto por debajo del fondo para meterse en el núcleo sin cerrarse
@@ -87,6 +102,7 @@ def _thread_body(comp, q, extra, tip, length):
                                                  adsk.fusion.FeatureOperations.NewBodyFeatureOperation)
     si.guideRail = comp.features.createPath(rail_curve, False)
     si.profileScaling = adsk.fusion.SweepProfileScalingOptions.SweepProfileNoScalingOption
+    step(0.8, tr('Sinfín: barriendo el filete…'))
     sw = comp.features.sweepFeatures.add(si)
     tb = _tbm().copy(sw.bodies.item(0))
     sw.deleteMe()
@@ -95,12 +111,14 @@ def _thread_body(comp, q, extra, tip, length):
     return tb
 
 
-def worm_solid(comp, q):
+def worm_solid(comp, q, step=span(None, 0, 1)):
     """Sinfín como cuerpo temporal, sin taladro."""
     tbm = _tbm()
     L = q['worm_length'] / 2
     A = q['A']
-    thread = _thread_body(comp, q, 0.0, q['r_tip'], q['worm_length'] + 2 * q['lead'])
+    # solo donde hay filete: en los tramos lisos la silueta queda por debajo del fondo y se recortaría entero
+    thread = _thread_body(comp, q, 0.0, q['r_tip'], 2 * q['thread_half'] + 2 * q['lead'], span(step, 0.0, 0.95))
+    step(0.95, tr('Sinfín: uniendo el filete al núcleo…'))
     for s in range(1, q['starts']):
         other = tbm.copy(thread)
         tbm.transform(other, worm_axis_rotation(q, 2 * math.pi * s / q['starts']))
@@ -108,6 +126,7 @@ def worm_solid(comp, q):
     core = _cyl((-L, A, 0), q['r_root'], (L, A, 0), q['r_root'])
     tbm.booleanOperation(thread, core, adsk.fusion.BooleanTypes.UnionBooleanType)
     # recorte: sólido de revolución de la silueta (un tronco de cono por tramo)
+    step(0.97, tr('Sinfín: recortando la silueta…'))
     env = None
     pts = G.worm_outline(q)
     for (x0, r0), (x1, r1) in zip(pts, pts[1:]):
@@ -148,8 +167,9 @@ def _cut_bore(comp, body, outline, plane, to_model, length, name):
     return ext.bodies.item(0) if ext.bodies.count else body
 
 
-def build_worm(comp, q, log):
-    tb = worm_solid(comp, q)
+def build_worm(comp, q, log, step=span(None, 0, 1)):
+    tb = worm_solid(comp, q, span(step, 0.0, 0.97))
+    step(0.97, tr('Sinfín: creando el cuerpo…'))
     bf = comp.features.baseFeatures.add()
     bf.name = tr('Sinfín')
     bf.startEdit()
@@ -157,6 +177,7 @@ def build_worm(comp, q, log):
     bf.finishEdit()
     body = bf.bodies.item(0)
     # taladro a lo largo del eje (X por y = A): boceto en el plano YZ, con u -> y, v -> z
+    step(0.98, tr('Sinfín: haciendo el taladro…'))
     body = _cut_bore(comp, body, G.bores(q)[0], comp.yZConstructionPlane, lambda u, v: (0.0, q['A'] + u, v),
                      q['worm_length'] + 2, tr('Taladro del sinfín'))
     body.name = tr('Sinfín')
@@ -166,7 +187,8 @@ def build_worm(comp, q, log):
 
 # ---------------------------------------------------------------- rueda
 
-def build_wheel(comp, q, log):
+def build_wheel(comp, q, log, step=span(None, 0, 1)):
+    step(0.0, tr('Rueda: preparando el disco…'))
     tbm = _tbm()
     W = q['wheel_width'] / 2
     blank = _cyl((0, 0, -W), q['rim'], (0, 0, W), q['rim'])
@@ -190,7 +212,9 @@ def build_wheel(comp, q, log):
 
     # un boceto por sección con el perfil cerrado del hueco de un diente (centrado en +Y)
     sketches = []
-    for c in q['section_z']:
+    sections = span(step, 0.07, 0.4)
+    for i, c in enumerate(q['section_z']):
+        sections(i / len(q['section_z']), tr('Rueda: perfil %d de %d…') % (i + 1, len(q['section_z'])))
         pin = comp.constructionPlanes.createInput()
         pin.setByOffset(comp.xYConstructionPlane, adsk.core.ValueInput.createByReal(c * MM))
         pl = comp.constructionPlanes.add(pin)
@@ -222,6 +246,7 @@ def build_wheel(comp, q, log):
             raise RuntimeError(tr('El perfil del hueco en z=%.2f no ha salido cerrado (%d perfiles).') % (c, sk.profiles.count))
         sketches.append(sk)
 
+    step(0.4, tr('Rueda: solevando dientes…'))
     li = comp.features.loftFeatures.createInput(adsk.fusion.FeatureOperations.NewBodyFeatureOperation)
     for sk in sketches:
         li.loftSections.add(sk.profiles.item(0))
@@ -230,6 +255,7 @@ def build_wheel(comp, q, log):
     loft.name = tr('Hueco del diente')
     cutter = loft.bodies.item(0)
 
+    step(0.65, tr('Rueda: repitiendo los huecos…'))
     oc = adsk.core.ObjectCollection.create()
     oc.add(cutter)
     pin = comp.features.circularPatternFeatures.createInput(oc, comp.zConstructionAxis)
@@ -237,6 +263,7 @@ def build_wheel(comp, q, log):
     pin.totalAngle = adsk.core.ValueInput.createByString('360 deg')
     pat = comp.features.circularPatternFeatures.add(pin)
     pat.name = tr('Huecos')
+    step(0.67, tr('Rueda: tallando los dientes…'))
     tools = adsk.core.ObjectCollection.create()
     tools.add(cutter)
     for b in pat.bodies:
@@ -248,6 +275,7 @@ def build_wheel(comp, q, log):
     cut = comp.features.combineFeatures.add(ci)
     cut.name = tr('Tallar rueda')
     body = cut.bodies.item(0)
+    step(0.93, tr('Rueda: haciendo el taladro…'))
     body = _cut_bore(comp, body, G.bores(q)[1], comp.xYConstructionPlane, lambda u, v: (u, v, 0.0),
                      q['wheel_width'] + 2, tr('Taladro de la rueda'))
     body.name = tr('Rueda')
@@ -319,8 +347,9 @@ def _joints(root, q, tag, parts, log):
 
 # ---------------------------------------------------------------- todo
 
-def build(design, prm, what='both'):
-    """Genera lo pedido (both / worm / wheel). Devuelve (q, cuerpo sinfín, cuerpo rueda, log)."""
+def build(design, prm, what='both', on_step=None):
+    """Genera lo pedido (both / worm / wheel). Devuelve (q, cuerpo sinfín, cuerpo rueda, log).
+    on_step(fracción, texto), si se da, avisa antes de cada etapa; la fracción va de 0 a 1 con cualquier what."""
     q, errors, warns, summary = G.check_params(prm)
     if errors:
         raise ValueError('\n'.join(errors))
@@ -347,9 +376,18 @@ def build(design, prm, what='both'):
             comp_wheel = occ_wheel.component
             comp_wheel.name = tr('Rueda %s') % tag
 
-    worm = build_worm(comp_worm, q, log) if what in ('both', 'worm') else None
-    wheel = build_wheel(comp_wheel, q, log) if what in ('both', 'wheel') else None
+    # lo que no se genera no pesa: la barra va de principio a fin con cualquier what
+    cost_worm = STEP_WEIGHTS['worm'] if what in ('both', 'worm') else 0.0
+    cost_wheel = STEP_WEIGHTS['wheel'] if what in ('both', 'wheel') else 0.0
+    cost_joints = STEP_WEIGHTS['joints'] if occ_worm is not None or occ_wheel is not None else 0.0
+    total = cost_worm + cost_wheel + cost_joints
+    end_worm = cost_worm / total
+    end_wheel = (cost_worm + cost_wheel) / total
 
+    worm = build_worm(comp_worm, q, log, span(on_step, 0.0, end_worm)) if cost_worm else None
+    wheel = build_wheel(comp_wheel, q, log, span(on_step, end_worm, end_wheel)) if cost_wheel else None
+
+    span(on_step, 0.0, 1.0)(end_wheel, tr('Creando las juntas…') if cost_joints else tr('Terminando…'))
     parts = {}
     if occ_worm is not None:
         parts['worm'] = (occ_worm, comp_worm)

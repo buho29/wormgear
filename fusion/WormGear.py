@@ -29,7 +29,7 @@ SETTINGS = os.path.join(HERE, 'settings.json')
 _app = adsk.core.Application.get()
 _ui = _app.userInterface
 _handlers = []
-_state = {}   # comando abierto y última validación (útil para depurar)
+_state = {}   # comando abierto, última validación y fallos de la ventana de progreso (útil para depurar)
 
 # (id del grupo, título, [(parámetro, etiqueta, tipo, mín, máx, paso)]); los textos pasan por tr() al usarlos
 #   tipos: len = mm, ang = grados, int = entero, float = número sin unidades, bool = casilla,
@@ -65,6 +65,7 @@ FIELDS = [
     ]),
 ]
 WHAT = [('both', 'Sinfín y rueda'), ('worm', 'Solo el sinfín'), ('wheel', 'Solo la rueda')]
+CHECK_SHARE = 0.28   # parte de la barra de progreso para la comprobación del engrane, si se hace (medida)
 
 
 def _load_settings():
@@ -221,6 +222,53 @@ class _ValidateHandler(adsk.core.ValidateInputsEventHandler):
         args.areInputsValid = _state['valid'] = _refresh(args.firingEvent.sender.commandInputs)
 
 
+class _Busy:
+    """Ventana de progreso mientras se genera. Un fallo de la ventana no puede estropear la generación: cualquier
+    propiedad suya puede lanzar RuntimeError ("failed to find product"). Sin botón de cancelar: una cancelación a
+    medias dejaría el modelo incompleto. Con delay = 1 s, Fusion la muestra antes si, por el valor de la barra, calcula
+    que lo que queda pasa de ese segundo (medido: sale a los 0,1 s con el primer aviso).
+    No usar adsk.doEvents() aquí: dentro de una vista previa de Voladizos FDM colgó y cerró Fusion."""
+
+    def __init__(self, title, message, delay=1):
+        self.dlg = None
+        self.drawn = False
+        try:
+            dlg = _ui.createProgressDialog()
+            dlg.isCancelButtonShown = False
+            dlg.show(title, message, 0, 1000, delay)
+            self.dlg = dlg
+        except Exception as e:
+            self._failed(e)
+
+    def _failed(self, error):
+        _state.setdefault('busy_errors', []).append(str(error))
+        self.dlg = None
+
+    def step(self, fraction, message=None):
+        if self.dlg:
+            try:
+                if message:
+                    self.dlg.message = message
+                # tope de 999: si la barra llega al máximo, la ventana se cierra sola aunque quede trabajo.
+                # Mínimo de 1: con el valor 0 la ventana no se muestra hasta el siguiente aviso, y el primero va
+                # justo antes de las hélices del sinfín, que bloquean Fusion muchos segundos
+                value = max(1, min(int(1000 * fraction), 999))
+                self.dlg.progressValue = value
+                if not self.drawn:
+                    # el primer valor la muestra, pero en blanco: se dibuja al recibir otro valor distinto
+                    self.drawn = True
+                    self.dlg.progressValue = min(value + 1, 999)
+            except Exception as e:
+                self._failed(e)
+
+    def close(self):
+        if self.dlg:
+            try:
+                self.dlg.hide()
+            except Exception as e:
+                self._failed(e)
+
+
 class _ExecuteHandler(adsk.core.CommandEventHandler):
     def notify(self, args):
         inputs = args.command.commandInputs
@@ -234,10 +282,18 @@ class _ExecuteHandler(adsk.core.CommandEventHandler):
             what = WHAT[inputs.itemById('what').selectedItem.index][0]
             do_check = inputs.itemById('check').value
             _save_settings(dict(prm, what=what, check=do_check))
-            q, worm, wheel, log = B.build(design, prm, what)
+            # solo build y check dentro del try/finally: la ventana se cierra siempre, también con error, y antes
+            # de cualquier messageBox (los del except de abajo se ejecutan después del finally)
+            run_check = do_check and what == 'both'
+            build_end = 1.0 - CHECK_SHARE if run_check else 1.0
+            busy = _Busy(tr('Sinfín y rueda'), tr('Generando…'))
+            try:
+                q, worm, wheel, log = B.build(design, prm, what, B.span(busy.step, 0.0, build_end))
+                res = C.check(q, worm, wheel, on_step=B.span(busy.step, build_end, 1.0)) if run_check else None
+            finally:
+                busy.close()
             msg = list(log)
-            if do_check and worm is not None and wheel is not None:
-                res = C.check(q, worm, wheel)
+            if res is not None:
                 _, txt = C.report(res, q)
                 msg.append('')
                 msg.append(txt)

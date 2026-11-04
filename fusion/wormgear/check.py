@@ -6,7 +6,7 @@ import math
 import adsk.core
 import adsk.fusion
 
-from .build import MM, P, V, worm_axis_rotation, wheel_rotation
+from .build import MM, P, V, span, worm_axis_rotation, wheel_rotation
 from .i18n import tr
 
 TOL = 1e-4   # mm³: por debajo se considera que no tocan
@@ -24,7 +24,13 @@ def _vol(b):
         return None
 
 
-def check(q, worm_body, wheel_body, phases=8):
+def check(q, worm_body, wheel_body, phases=8, on_step=None):
+    """on_step(fracción, texto), si se da, avisa antes de cada etapa y de cada medida."""
+    step = span(on_step, 0.0, 1.0)
+    # medidas: las fases y, por cada lado del juego, una de partida y 12 de bisección (y antes, preparar la zona)
+    bisections = 12
+    total = 1 + phases + 2 * (1 + bisections)
+    step(0.0, tr('Comprobando interferencias: preparando…'))
     tbm = adsk.fusion.TemporaryBRepManager.get()
     I = adsk.fusion.BooleanTypes.IntersectionBooleanType
     worm = tbm.copy(worm_body)
@@ -53,14 +59,19 @@ def check(q, worm_body, wheel_body, phases=8):
         return float('inf')   # no se puede medir: se cuenta como contacto
 
     pitch = 2 * math.pi / q['teeth']
-    vols = [overlap(pitch * k / phases) for k in range(phases)]
+    vols = []
+    for k in range(phases):
+        step((1 + k) / total, tr('Comprobando interferencias: fase %d de %d…') % (k + 1, phases))
+        vols.append(overlap(pitch * k / phases))
 
-    def first_contact(sign):
+    def first_contact(sign, done):
+        step((1 + done) / total, tr('Comprobando el juego…'))
         hi = math.radians(2 * 360 * q['backlash'] / q['lead'] + 2)
         if overlap(0, sign * hi) <= TOL:
             return None
         lo = 0.0
-        for _ in range(12):
+        for i in range(bisections):
+            step((2 + done + i) / total)
             mid = (lo + hi) / 2
             if overlap(0, sign * mid) > TOL:
                 hi = mid
@@ -68,7 +79,7 @@ def check(q, worm_body, wheel_body, phases=8):
                 lo = mid
         return math.degrees((lo + hi) / 2)
 
-    pos, neg = first_contact(+1), first_contact(-1)
+    pos, neg = first_contact(+1, phases), first_contact(-1, phases + 1 + bisections)
     play_mm = None if pos is None or neg is None else (pos + neg) / 360 * q['lead']
     return dict(overlaps=vols, max_overlap=max(vols), play_pos_deg=pos, play_neg_deg=neg, play_mm=play_mm)
 

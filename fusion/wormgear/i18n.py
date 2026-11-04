@@ -111,6 +111,27 @@ EN = {
         'Could not create the motion link (%s): create it by hand, 360° of the worm = %.4f° of the wheel.',
     'No se pudo agrupar la línea de tiempo (%s).': 'Could not group the timeline (%s).',
 
+    # ------------------------------------------------ ventana de progreso de Fusion
+    'Generando…': 'Generating…',
+    'Sinfín: dibujando la hélice (1 de 2)…': 'Worm: drawing the helix (1 of 2)…',
+    'Sinfín: dibujando la hélice (2 de 2)…': 'Worm: drawing the helix (2 of 2)…',
+    'Sinfín: barriendo el filete…': 'Worm: sweeping the thread…',
+    'Sinfín: uniendo el filete al núcleo…': 'Worm: joining the thread to the core…',
+    'Sinfín: recortando la silueta…': 'Worm: trimming the outline…',
+    'Sinfín: creando el cuerpo…': 'Worm: creating the body…',
+    'Sinfín: haciendo el taladro…': 'Worm: making the bore…',
+    'Rueda: preparando el disco…': 'Wheel: preparing the blank…',
+    'Rueda: perfil %d de %d…': 'Wheel: section %d of %d…',
+    'Rueda: solevando dientes…': 'Wheel: lofting the teeth…',
+    'Rueda: repitiendo los huecos…': 'Wheel: patterning the gaps…',
+    'Rueda: tallando los dientes…': 'Wheel: cutting the teeth…',
+    'Rueda: haciendo el taladro…': 'Wheel: making the bore…',
+    'Creando las juntas…': 'Creating the joints…',
+    'Terminando…': 'Finishing…',
+    'Comprobando interferencias: preparando…': 'Checking interference: preparing…',
+    'Comprobando interferencias: fase %d de %d…': 'Checking interference: phase %d of %d…',
+    'Comprobando el juego…': 'Checking the backlash…',
+
     # ------------------------------------------------ comprobación
     'Interferencia en %d fases de un diente: %s (máx. %.4f mm³)':
         'Interference at %d phases of one tooth: %s (max. %.4f mm³)',
