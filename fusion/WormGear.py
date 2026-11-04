@@ -134,6 +134,9 @@ class _CreatedHandler(adsk.core.CommandCreatedEventHandler):
             cmd = args.command
             _state['cmd'] = cmd
             cmd.okButtonText = tr('Generar')
+            # el tamaño inicial, para que Fusion lo tenga en cuenta al colocar el diálogo la primera vez: con
+            # solo el mínimo, lo coloca con su ancho por defecto y luego crece fuera de la pantalla
+            cmd.setDialogInitialSize(420, 600)
             cmd.setDialogMinimumSize(420, 600)
             inputs = cmd.commandInputs
             s = _load_settings()
@@ -163,7 +166,7 @@ class _CreatedHandler(adsk.core.CommandCreatedEventHandler):
             for key, label in WHAT:
                 dd.listItems.add(tr(label), key == s.get('what', 'both'))
             opt.addBoolValueInput('check', tr('Comprobar engrane al terminar'), True, '', bool(s.get('check', True)))
-            inputs.addTextBoxCommandInput('info', tr('Resumen'), _evaluate(inputs)[0], 12, True)
+            inputs.addTextBoxCommandInput('info', tr('Resumen'), _evaluate(inputs)[0], 12, True).isFullWidth = True
             _update_visibility(inputs)
 
             for ev, h in ((cmd.execute, _ExecuteHandler()), (cmd.inputChanged, _ChangedHandler()),
