@@ -166,39 +166,6 @@ def build_worm(comp, q, log):
 
 # ---------------------------------------------------------------- rueda
 
-# puntos por flanco. En las secciones de los extremos, el pie del diente tiene una esquina casi tangencial y la
-# spline ajustada se puede cruzar allí según por dónde caigan los puntos: si pasa, se repite con otro número
-GAP_POINTS = (40, 48, 56, 80, 100)
-
-
-def _gap_sketch(comp, plane, q, c, n):
-    """Boceto del hueco de un diente en el plano z=c, con n+1 puntos por flanco."""
-    sk = comp.sketches.add(plane)
-    sk.name = tr('Hueco z=%+.2f') % c
-    sk.isComputeDeferred = True
-    left, right, rr, ro = G.gap_profile(q, c, n)
-
-    def sp(pt):
-        return sk.modelToSketchSpace(P(pt[0], pt[1], c))
-
-    def spline(pts):
-        oc = adsk.core.ObjectCollection.create()
-        for pt in pts:
-            oc.add(sp(pt))
-        return sk.sketchCurves.sketchFittedSplines.add(oc)
-
-    sl = spline(left)                    # fondo -> fuera
-    sr = spline(list(reversed(right)))   # fuera -> fondo
-    a_out = (G.angle_from_y(left[-1]) + G.angle_from_y(right[-1])) / 2
-    a_root = (G.angle_from_y(left[0]) + G.angle_from_y(right[0])) / 2
-    arcs = sk.sketchCurves.sketchArcs
-    arcs.addByThreePoints(sl.endSketchPoint, sp((ro * math.sin(a_out), ro * math.cos(a_out))), sr.startSketchPoint)
-    arcs.addByThreePoints(sr.endSketchPoint, sp((rr * math.sin(a_root), rr * math.cos(a_root))), sl.startSketchPoint)
-    sk.isComputeDeferred = False
-    sk.isVisible = False
-    return sk
-
-
 def build_wheel(comp, q, log):
     tbm = _tbm()
     W = q['wheel_width'] / 2
@@ -228,14 +195,31 @@ def build_wheel(comp, q, log):
         pin.setByOffset(comp.xYConstructionPlane, adsk.core.ValueInput.createByReal(c * MM))
         pl = comp.constructionPlanes.add(pin)
         pl.isLightBulbOn = False
-        for n in GAP_POINTS:
-            sk = _gap_sketch(comp, pl, q, c, n)
-            profiles = sk.profiles.count
-            if profiles == 1:
-                break
-            sk.deleteMe()
-        else:
-            raise RuntimeError(tr('El perfil del hueco en z=%.2f no ha salido cerrado (%d perfiles).') % (c, profiles))
+        sk = comp.sketches.add(pl)
+        sk.name = tr('Hueco z=%+.2f') % c
+        sk.isComputeDeferred = True
+        left, right, rr, ro = G.gap_profile(q, c)
+
+        def sp(pt):
+            return sk.modelToSketchSpace(P(pt[0], pt[1], c))
+
+        def spline(pts):
+            oc = adsk.core.ObjectCollection.create()
+            for pt in pts:
+                oc.add(sp(pt))
+            return sk.sketchCurves.sketchFittedSplines.add(oc)
+
+        sl = spline(left)                    # fondo -> fuera
+        sr = spline(list(reversed(right)))   # fuera -> fondo
+        a_out = (G.angle_from_y(left[-1]) + G.angle_from_y(right[-1])) / 2
+        a_root = (G.angle_from_y(left[0]) + G.angle_from_y(right[0])) / 2
+        arcs = sk.sketchCurves.sketchArcs
+        arcs.addByThreePoints(sl.endSketchPoint, sp((ro * math.sin(a_out), ro * math.cos(a_out))), sr.startSketchPoint)
+        arcs.addByThreePoints(sr.endSketchPoint, sp((rr * math.sin(a_root), rr * math.cos(a_root))), sl.startSketchPoint)
+        sk.isComputeDeferred = False
+        sk.isVisible = False
+        if sk.profiles.count != 1:
+            raise RuntimeError(tr('El perfil del hueco en z=%.2f no ha salido cerrado (%d perfiles).') % (c, sk.profiles.count))
         sketches.append(sk)
 
     li = comp.features.loftFeatures.createInput(adsk.fusion.FeatureOperations.NewBodyFeatureOperation)

@@ -139,8 +139,8 @@ Resultados de las pruebas de FreeCAD (`freecad/tests/run_tests.py`):
 |---|---|---|---|
 | m1.5, 30 dientes, 1 entrada, 45° (por defecto) | 6.2 | 0 mm³ | 0.104 mm |
 | m2, 20 dientes, 2 entradas, 30° | 6.2 | 0 mm³ | 0.101 mm |
-| m1.5, 60 dientes, 3 entradas, 30° | 6.1 | 0 mm³ | 0.102 mm |
-| m1.5, 30 dientes, 1 entrada, 20° con diente normal (cabeza 1·m, pie 1.25·m) | 6.2 | 0 mm³ | 0.100 mm |
+| m1.5, 60 dientes, 3 entradas, 30° | 6.1 | 0 mm³ | 0.101 mm |
+| m1.5, 30 dientes, 1 entrada, 20° con diente normal (cabeza 1·m, pie 1.25·m) | 6.2 | 0 mm³ | 0.101 mm |
 | m1.5, 30 dientes, 2 entradas, 45°, **a izquierdas**, filete de 26 mm en un sinfín de 40 con tramos lisos de Ø10, taladro hexagonal en el sinfín y con plano en D en la rueda | 6.2 | 0 mm³ | 0.100 mm |
 
 En Fusion, los cinco juegos dieron 0 mm³ y un juego de 0.099 a 0.100 mm. Con los valores por defecto, eso son ±3.8° de giro del sinfín. Con el juego a izquierdas y el enlace de movimiento, la rueda gira al revés sin chocar.

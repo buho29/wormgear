@@ -192,7 +192,9 @@ def flank(q, c, sigma, n=40):
     - la trocoide de la esquina de la cabeza, que es la que talla el pie del diente. Con poco ángulo de flanco
       la envolvente no baja hasta el fondo y, sin la trocoide, la cresta del sinfín rozaba ahí la rueda.
     La esquina está en y = A - √(hob_tip² - c²) = rr, así que su trocoide sale del círculo de fondo: con
-    X = x_esquina - R2·θ, el punto está a radio √(X² + rr²) y a un ángulo atan2(X, rr) + θ desde +Y."""
+    X = x_esquina - R2·θ, el punto está a radio √(X² + rr²) y a un ángulo atan2(X, rr) + θ desde +Y.
+    A cada radio hay dos puntos, con ±X, y vale el que más entra en el diente: cuál es cambia según el fondo quede
+    por debajo o por encima de R2. Con solo uno, en los extremos de la rueda quedaba un escalón en el pie."""
     rr = root_radius(q, c)
     span = q['R_OUT'] - rr
     u0 = -math.sqrt(q['hob_tip'] ** 2 - c * c)   # cabeza del cortador
@@ -202,8 +204,9 @@ def flank(q, c, sigma, n=40):
     radii = [rr + span * (k / N) ** 2 for k in range(N + 1)]
     best = []
     for r in radii:
-        X = sigma * math.sqrt(max(r * r - rr * rr, 0.0))
-        best.append(math.atan2(X, rr) + (x0 - X) / q['R2'])
+        X = math.sqrt(max(r * r - rr * rr, 0.0))
+        best.append(max(math.atan2(X, rr) + (x0 - X) / q['R2'], math.atan2(-X, rr) + (x0 + X) / q['R2'],
+                        key=lambda a: sigma * a))
     u1 = -0.2
     steps = 400
     prev = None

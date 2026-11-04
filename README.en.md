@@ -139,8 +139,8 @@ Results of the FreeCAD tests (`freecad/tests/run_tests.py`):
 |---|---|---|---|
 | m1.5, 30 teeth, 1 start, 45° (default) | 6.2 | 0 mm³ | 0.104 mm |
 | m2, 20 teeth, 2 starts, 30° | 6.2 | 0 mm³ | 0.101 mm |
-| m1.5, 60 teeth, 3 starts, 30° | 6.1 | 0 mm³ | 0.102 mm |
-| m1.5, 30 teeth, 1 start, 20° with full-depth tooth (addendum 1·m, dedendum 1.25·m) | 6.2 | 0 mm³ | 0.100 mm |
+| m1.5, 60 teeth, 3 starts, 30° | 6.1 | 0 mm³ | 0.101 mm |
+| m1.5, 30 teeth, 1 start, 20° with full-depth tooth (addendum 1·m, dedendum 1.25·m) | 6.2 | 0 mm³ | 0.101 mm |
 | m1.5, 30 teeth, 2 starts, 45°, **left-handed**, 26 mm thread on a 40 mm worm with Ø10 plain ends, hexagonal bore in the worm and D-flat bore in the wheel | 6.2 | 0 mm³ | 0.100 mm |
 
 In Fusion, all five sets gave 0 mm³ and a backlash of 0.099 to 0.100 mm. With the defaults, that is ±3.8° of worm rotation. With the left-handed set and the motion link, the wheel turns the other way without colliding.
