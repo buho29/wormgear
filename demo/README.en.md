@@ -30,6 +30,8 @@ The STEP files in [`3d files/`](3d%20files/) are already in their printing orien
 
 [`conjunto.step`](3d%20files/conjunto.step) is the assembled demo, without the support.
 
+[`WormGear.3mf`](3d%20files/WormGear.3mf) is the Bambu Studio project with all the parts on a single plate. It is set up for a Bambu Lab P1S with a 0.4 nozzle, PLA and 0.2 mm layers. [`WormGear.f3d`](3d%20files/WormGear.f3d) is the Fusion design.
+
 ![Parts in printing orientation](img/piezas.png)
 
 ## 🛞 The wheel support

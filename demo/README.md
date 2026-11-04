@@ -30,6 +30,8 @@ Los STEP de [`3d files/`](3d%20files/) ya están en su postura de impresión, co
 
 [`conjunto.step`](3d%20files/conjunto.step) es la demo montada, sin el soporte.
 
+[`WormGear.3mf`](3d%20files/WormGear.3mf) es el proyecto de Bambu Studio con todas las piezas en una sola placa. Está preparado para una Bambu Lab P1S con boquilla de 0.4, PLA y capas de 0.2 mm. [`WormGear.f3d`](3d%20files/WormGear.f3d) es el diseño de Fusion.
+
 ![Piezas en postura de impresión](img/piezas.png)
 
 ## 🛞 El soporte de la rueda
