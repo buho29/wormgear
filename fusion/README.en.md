@@ -51,13 +51,18 @@ If you change the code, stop the add-in and run it again.
 
 The screenshot is of the dialog in Spanish. The parameters and their defaults are on the [front page](../README.en.md#-parameters).
 
-The *Summary* box updates as you type. It shows:
+The summary, below the options, updates as you type. It has one line per value:
 - the gear ratio;
 - the center distance;
+- the lead;
 - the lead angle;
-- the estimated efficiency, greased and dry, and whether the worm self-locks;
-- the diameters;
-- the warnings: thin worm crest, throat past 45°, overhangs, undercut, pointed teeth and thin hub.
+- the estimated efficiency, greased and dry;
+- whether the worm self-locks: yes, dry only or no;
+- the worm and wheel diameters;
+- the worm crest and the tooth tip;
+- the thread and plain ends, and the face chamfer, if there are any.
+
+Below it come the errors and the warnings: thin worm crest, throat past 45°, overhangs, undercut, pointed teeth and thin hub.
 
 With an error it will not generate.
 

@@ -447,26 +447,27 @@ def check_params(prm):
     eta_g, eta_d = efficiency(q, MU_GREASED)[0], efficiency(q, MU_DRY)[0]
     lim_g, lim_d = locking_limit_deg(q, MU_GREASED), locking_limit_deg(q, MU_DRY)
     if q['lead_angle_deg'] <= lim_g:
-        locking = tr('autobloqueante: la rueda no mueve el sinfín ni con grasa (con grasa lo es hasta %.1f° de hélice)') % lim_g
+        locking = tr('sí')
     elif q['lead_angle_deg'] <= lim_d:
-        locking = tr('puede bloquearse en seco, pero con grasa la rueda mueve el sinfín (con grasa se bloquea hasta %.1f° '
-                     'de hélice)') % lim_g
+        locking = tr('solo en seco')
     else:
-        locking = tr('reversible: la rueda mueve el sinfín (en seco se bloquea hasta %.1f° de hélice)') % lim_d
-    summary = (tr('Relación %g:1 (%d dientes / %d entradas) · entre ejes %.2f mm · avance %.3f mm · hélice %.2f° a %s\n'
-                  'Rendimiento %.0f %% con grasa (μ %.1f) y %.0f %% en seco (μ %.1f) · %s\n'
-                  'Sinfín Ø%.2f / fondo Ø%.2f · rueda Ø%.2f primitivo, borde Ø%.2f · cresta del sinfín %.2f mm%s')
-               % (round(q['teeth'] / q['starts'], 3), q['teeth'], q['starts'], q['A'], q['lead'], q['lead_angle_deg'],
-                  tr('izquierdas') if q['hand'] < 0 else tr('derechas'),
-                  100 * eta_g, MU_GREASED, 100 * eta_d, MU_DRY, locking,
-                  2 * q['r_tip'], 2 * q['r_root'], 2 * q['R2'], 2 * q['rim'], crest,
-                  '' if land is None else tr(' · cabeza del diente de la rueda %.2f mm') % land))
+        locking = tr('no')
+    lines = [tr('Relación: %g:1') % round(q['teeth'] / q['starts'], 3),
+             tr('Entre ejes: %.2f mm') % q['A'],
+             tr('Avance: %.3f mm') % q['lead'],
+             tr('Hélice: %.2f° a %s') % (q['lead_angle_deg'], tr('izquierdas') if q['hand'] < 0 else tr('derechas')),
+             tr('Rendimiento: %.0f %% con grasa, %.0f %% en seco') % (100 * eta_g, 100 * eta_d),
+             tr('Autobloqueo: %s') % locking,
+             tr('Sinfín: Ø%.2f, fondo Ø%.2f') % (2 * q['r_tip'], 2 * q['r_root']),
+             tr('Rueda: Ø%.2f, borde Ø%.2f') % (2 * q['R2'], 2 * q['rim']),
+             tr('Cresta del sinfín: %.2f mm') % crest]
+    if land is not None:
+        lines.append(tr('Cabeza del diente: %.2f mm') % land)
     if partial:
-        summary += (tr('\nFilete de %.1f mm (mínimo %.1f) y tramos lisos de Ø%.2f')
-                    % (2 * q['thread_half'], need, 2 * q['r_shoulder']))
+        lines.append(tr('Filete: %.1f mm (mín. %.1f), lisos Ø%.2f') % (2 * q['thread_half'], need, 2 * q['r_shoulder']))
     if q['chamfer_z'] is not None:
-        summary += (tr('\nChaflán de 45° en las caras desde z = ±%.2f mm (ahí el diente baja de la mitad de su altura)')
-                    % q['chamfer_z'])
+        lines.append(tr('Chaflán: desde z = ±%.2f mm') % q['chamfer_z'])
+    summary = '\n'.join(lines)
     return q, errors, warns, summary
 
 

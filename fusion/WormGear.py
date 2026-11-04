@@ -120,7 +120,7 @@ def _evaluate(inputs):
         q, errors, warns, summary = G.check_params(prm)
     except Exception as e:   # combinación que la matemática no sabe tratar
         return tr('<b><font color="#d33">✖ Con estos valores no sale geometría: %s</font></b>') % e, False
-    html = summary.replace('\n', '<br>')
+    html = '<br>'.join('<b>%s:</b>%s' % tuple(line.split(':', 1)) for line in summary.split('\n'))
     for e in errors:
         html += '<br><b><font color="#d33">✖ %s</font></b>' % e
     for w in warns:
@@ -133,6 +133,7 @@ class _CreatedHandler(adsk.core.CommandCreatedEventHandler):
         try:
             cmd = args.command
             _state['cmd'] = cmd
+            _state.pop('html', None)
             cmd.okButtonText = tr('Generar')
             # el tamaño inicial, para que Fusion lo tenga en cuenta al colocar el diálogo la primera vez: con
             # solo el mínimo, lo coloca con su ancho por defecto y luego crece fuera de la pantalla
@@ -197,8 +198,10 @@ def _refresh(inputs):
     except Exception:
         html, valid = (tr('<b><font color="#d33">✖ Error interno del complemento:</font></b><br>%s')
                        % traceback.format_exc().replace('\n', '<br>')), False
+    # se compara con lo último escrito: al leer formattedText, Fusion devuelve otro HTML si lleva negritas
     info = inputs.itemById('info')
-    if info and info.formattedText != html:
+    if info and _state.get('html') != html:
+        _state['html'] = html
         info.formattedText = html
     return valid
 

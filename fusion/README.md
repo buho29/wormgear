@@ -51,13 +51,18 @@ Si cambias el código, para el complemento y vuelve a ejecutarlo.
 
 Los parámetros y sus valores por defecto están en la [portada](../README.md#-parámetros).
 
-El cuadro *Resumen* se actualiza mientras se teclea. Muestra:
+El resumen, debajo de las opciones, se actualiza mientras se teclea. Tiene una línea por dato:
 - la relación de transmisión;
 - la distancia entre ejes;
+- el avance;
 - el ángulo de hélice;
-- el rendimiento estimado, con grasa y en seco, y si el sinfín se autobloquea;
-- los diámetros;
-- los avisos: cresta del sinfín muy fina, garganta de más de 45°, voladizos, socavado, dientes en punta y poco cubo.
+- el rendimiento estimado, con grasa y en seco;
+- si el sinfín se autobloquea: sí, solo en seco o no;
+- los diámetros del sinfín y de la rueda;
+- la cresta del sinfín y la cabeza del diente;
+- el filete y los tramos lisos, y el chaflán de las caras, si los hay.
+
+Debajo salen los errores y los avisos: cresta del sinfín muy fina, garganta de más de 45°, voladizos, socavado, dientes en punta y poco cubo.
 
 Con un error no deja generar.
 

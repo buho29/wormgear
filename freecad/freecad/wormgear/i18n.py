@@ -122,24 +122,23 @@ EN = {
         'Backlash: the worm turns +%.2f° / -%.2f° until contact = %.3f mm axial (requested %.3f mm)',
 
     # ------------------------------------------------ geometry: resumen, errores y avisos
-    'Relación %g:1 (%d dientes / %d entradas) · entre ejes %.2f mm · avance %.3f mm · hélice %.2f° a %s\n'
-    'Rendimiento %.0f %% con grasa (μ %.1f) y %.0f %% en seco (μ %.1f) · %s\n'
-    'Sinfín Ø%.2f / fondo Ø%.2f · rueda Ø%.2f primitivo, borde Ø%.2f · cresta del sinfín %.2f mm%s':
-        'Ratio %g:1 (%d teeth / %d starts) · center distance %.2f mm · lead %.3f mm · lead angle %.2f°, %s\n'
-        'Efficiency %.0f %% greased (μ %.1f), %.0f %% dry (μ %.1f) · %s\n'
-        'Worm Ø%.2f / root Ø%.2f · wheel Ø%.2f pitch, rim Ø%.2f · worm crest %.2f mm%s',
+    'Relación: %g:1': 'Ratio: %g:1',
+    'Entre ejes: %.2f mm': 'Center distance: %.2f mm',
+    'Avance: %.3f mm': 'Lead: %.3f mm',
+    'Hélice: %.2f° a %s': 'Lead angle: %.2f°, %s',
     'derechas': 'right-handed',
     'izquierdas': 'left-handed',
-    'autobloqueante: la rueda no mueve el sinfín ni con grasa (con grasa lo es hasta %.1f° de hélice)':
-        'self-locking: the wheel cannot drive the worm, even greased (greased, up to %.1f° lead angle)',
-    'puede bloquearse en seco, pero con grasa la rueda mueve el sinfín (con grasa se bloquea hasta %.1f° de hélice)':
-        'may lock when dry, but greased the wheel can drive the worm (greased, it locks up to %.1f° lead angle)',
-    'reversible: la rueda mueve el sinfín (en seco se bloquea hasta %.1f° de hélice)':
-        'reversible: the wheel can drive the worm (dry, it locks up to %.1f° lead angle)',
-    ' · cabeza del diente de la rueda %.2f mm': ' · wheel tooth tip %.2f mm',
-    '\nFilete de %.1f mm (mínimo %.1f) y tramos lisos de Ø%.2f': '\nThread %.1f mm long (minimum %.1f), plain ends Ø%.2f',
-    '\nChaflán de 45° en las caras desde z = ±%.2f mm (ahí el diente baja de la mitad de su altura)':
-        '\n45° chamfer on the faces from z = ±%.2f mm (there the tooth drops below half its height)',
+    'Rendimiento: %.0f %% con grasa, %.0f %% en seco': 'Efficiency: %.0f %% greased, %.0f %% dry',
+    'Autobloqueo: %s': 'Self-locking: %s',
+    'sí': 'yes',
+    'solo en seco': 'dry only',
+    'no': 'no',
+    'Sinfín: Ø%.2f, fondo Ø%.2f': 'Worm: Ø%.2f, root Ø%.2f',
+    'Rueda: Ø%.2f, borde Ø%.2f': 'Wheel: Ø%.2f, rim Ø%.2f',
+    'Cresta del sinfín: %.2f mm': 'Worm crest: %.2f mm',
+    'Cabeza del diente: %.2f mm': 'Tooth tip: %.2f mm',
+    'Filete: %.1f mm (mín. %.1f), lisos Ø%.2f': 'Thread: %.1f mm (min. %.1f), plain Ø%.2f',
+    'Chaflán: desde z = ±%.2f mm': 'Chamfer: from z = ±%.2f mm',
     'no se pudo calcular el flanco en z=%.2f': 'could not compute the flank at z=%.2f',
     'forma de taladro desconocida (%s)': 'unknown bore shape (%s)',
     'el plano en D tiene que estar entre %.2f y %.2f mm del lado opuesto':
