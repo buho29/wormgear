@@ -10,11 +10,11 @@ FILE_DESCRIPTION(
 
 FILE_NAME(
 /* name */ 'sinfin.step',
-/* time_stamp */ '2026-11-03T08:44:56+01:00',
+/* time_stamp */ '2026-11-06T11:54:38+01:00',
 /* author */ (''),
 /* organization */ (''),
 /* preprocessor_version */ 'ST-DEVELOPER v20.2',
-/* originating_system */ 'Autodesk Translation Framework v15.15.0.0',
+/* originating_system */ 'Autodesk Translation Framework v15.17.0.0',
 /* authorisation */ '');
 
 FILE_SCHEMA (('AUTOMOTIVE_DESIGN { 1 0 10303 214 3 1 1 }'));

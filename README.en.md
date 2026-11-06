@@ -44,7 +44,7 @@ The math lives in `wormgear/geometry.py`, which does not depend on any CAD and i
 
 <img src="demo/img/conjunto.png" alt="Assembled WormGear demo" width="480">
 
-The default gear set, mounted on a base with columns and caps locked with filament. The worm and the wheel are each printed in one piece with their shafts, and turning the knob turns the wheel. The parts, how to print them and how to assemble them are in the [demo](demo/README.en.md).
+The default gear set, mounted on a base with columns and caps. The worm and the wheel are each printed in one piece with their shafts, and turning the knob turns the wheel. The parts, how to print them and how to assemble them are in the [demo](demo/README.en.md).
 
 ### A short story
 

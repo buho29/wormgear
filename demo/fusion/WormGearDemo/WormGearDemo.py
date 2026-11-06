@@ -1,6 +1,6 @@
 # Demo de WormGear: rueda de pie y sinfín tumbado encima, cada uno de una sola pieza con sus ejes.
 # Los ejes giran en "rodamientos" de dos conos de 45°: medio alojamiento en una columna de la base y la otra
-# mitad en una tapa que entra en la columna de arriba abajo, guiada, y se bloquea con un pasador de filamento.
+# mitad en una tapa que entra en la columna de arriba abajo, guiada.
 # El sinfín lleva un pomo moleteado en un eje.
 #
 # Salvo el sinfín y la rueda (que salen de wormgear.build), todo se modela con operaciones en la línea de tiempo
@@ -56,18 +56,16 @@ TOWER_GAP_X = 1.6  # entre el borde de la rueda y las columnas del sinfín
 # DISH_RING hacia dentro (ahí apoya el soporte de impresión), y una solevación hasta el mismo contorno DISH_DEPTH
 # más adentro y DISH_DEPTH más hondo: la pared sigue los dientes y no baja de 45° (menos puente)
 DISH_RING = 0.8
-DISH_DEPTH = 4.0
+DISH_DEPTH = 7.0
 # soporte de la rueda para imprimirla de pie sobre el eje de abajo: el anillo de DISH_RING de la cara de abajo
 # extruido hasta la cama, con un ala (brim) en la cama; en sección es una L. Va en su propio cuerpo, sin unir
 SUPPORT_BRIM = 6.0    # lo que sale el ala por fuera del borde de la rueda
 SUPPORT_BRIM_T = 0.6  # grueso del ala
 # columna: horquilla abierta arriba; la tapa entra de arriba abajo entre los dos brazos, guiada por una lengüeta
-# a cada lado en una ranura vertical, y se bloquea con un pasador de filamento que atraviesa brazos y tapa
+# a cada lado en una ranura vertical
 TONGUE_D = 1.0     # lo que entra la lengüeta en el brazo
 TONGUE_T = 3.0     # ancho de la lengüeta (a lo largo del eje)
-CAP_H = 12.5       # alto de la tapa por encima del eje
-PIN_D = 1.75 + 2 * FIT
-PIN_Z = 8.3        # altura del pasador por encima del eje (lejos del doble cono)
+CAP_H = 9.5        # alto de la tapa por encima del eje
 # redondeo de las aristas de arriba en las caras por las que pasa el eje (columna y tapa a la vez). La ranura de
 # la lengüeta está a 4.3 mm de la cara: con 4 solo el último 0.4 mm junto a la ranura baja de 2 mm de pared, y a
 # la tapa, que se imprime boca abajo, le queda un plano de (grueso - 2·TOP_R) para apoyar
@@ -194,7 +192,7 @@ def plus(u_half, v_half, tu_half, tv_half):
 
 
 def diamond(hd):
-    """Rombo (u, v) de semidiagonal hd: el taladro del pasador con las puntas arriba y abajo (techo a 45°)."""
+    """Rombo (u, v) de semidiagonal hd, con las puntas arriba y abajo (techo a 45°)."""
     return [(hd, 0), (0, hd), (-hd, 0), (0, -hd)]
 
 
@@ -502,7 +500,7 @@ def _engrave_text(comp, face, text, body, name):
 
 def build_base(root, lay):
     """Base: placa con las esquinas redondeadas y cuatro columnas en horquilla, con medio alojamiento, las
-    ranuras de las lengüetas de la tapa, el taladro del pasador y el redondeo de arriba."""
+    ranuras de las lengüetas de la tapa y el redondeo de arriba."""
     occ = root.occurrences.addNewComponent(adsk.core.Matrix3D.create())
     comp = occ.component
     comp.name = 'Base'
@@ -557,12 +555,6 @@ def build_base(root, lay):
         polys = [[at(c, s, 0, cz + r) for s, r in closed(housing_profile())] for c in centers]
         line = (at(centers[0], -200, 0, cz), at(centers[0], 200, 0, cz))
         _revolve(comp, plane, polys, line, CUT, 'Alojamientos %s' % tag, [body])
-        # taladro del pasador, a lo largo de w
-        sk = _sketch(comp, plane, 'Pasadores %s' % tag)
-        for c in centers:
-            _poly(sk, [at(c, u, 0, cz + PIN_Z + v) for u, v in diamond(PIN_D / 2 * math.sqrt(2))])
-        sk.isVisible = False
-        _extrude(comp, _all_profiles(sk), COL_W + 2, CUT, 'Pasadores %s' % tag, [body], symmetric=True)
         # redondeo de arriba en las caras por las que pasa el eje
         body = comp.bRepBodies.item(0)
         edges = []
@@ -583,7 +575,6 @@ def build_base(root, lay):
             if not any(_near(abs(dot(add(p, mul(c, -1)), w)), COL_W / 2) and
                        abs(dot(add(p, mul(c, -1)), axis)) < HOUSING_T / 2 for c in centers):
                 continue
-            # solo el contorno de fuera: el taladro del pasador se queda con las aristas vivas
             for e in [lp for lp in f.loops if lp.isOuter][0].edges:
                 bb = e.boundingBox
                 if not (_near(bb.minPoint.z / MM, PLATE_T) and _near(bb.maxPoint.z / MM, PLATE_T)):
@@ -624,10 +615,6 @@ def build_caps(root, lay):
     body.name = 'Tapa'
     _revolve(comp, comp.xZConstructionPlane, [[(s, 0, r) for s, r in closed(housing_profile())]],
              ((-200, 0, 0), (200, 0, 0)), CUT, 'Alojamiento', [body])
-    sk = _sketch(comp, comp.xZConstructionPlane, 'Pasador')
-    _poly(sk, [(u, 0, PIN_Z + v) for u, v in diamond(PIN_D / 2 * math.sqrt(2))])
-    sk.isVisible = False
-    _extrude(comp, _all_profiles(sk), COL_W + 2, CUT, 'Pasador', [body], symmetric=True)
     body = comp.bRepBodies.item(0)
     _fillet(comp, _top_edges(body, (1, 0, 0), (0, 0, 0), CAP_H),
             _param(comp.parentDesign, 'redondeo_columnas', TOP_R, ''), 'Redondeo')
@@ -959,8 +946,8 @@ def build_demo(design):
             grp.name = 'Demo WormGear'
     except Exception as e:
         log.append('No se pudo agrupar la línea de tiempo (%s).' % str(e).splitlines()[0])
-    log.append('Demo: A = %.1f mm, rueda Ø%.1f a z = %.1f, sinfín Ø%.1f a z = %.1f; pasador de %.0f mm'
-               % (q['A'], 2 * q['rim'], H, 2 * q['r_tip'], lay.Hw, COL_W))
+    log.append('Demo: A = %.1f mm, rueda Ø%.1f a z = %.1f, sinfín Ø%.1f a z = %.1f'
+               % (q['A'], 2 * q['rim'], H, 2 * q['r_tip'], lay.Hw))
     for k, (o, b) in parts.items():
         log.append('  %-8s %8.0f mm³' % (k, b.volume * 1000))
     log.append('  soporte  %8.0f mm³, %.1f mm de alto' % (support.volume * 1000, lay.w_bed - lay.w_face))

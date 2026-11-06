@@ -44,7 +44,7 @@ La matemática está en `wormgear/geometry.py`, que no depende de ningún CAD y 
 
 <img src="demo/img/conjunto.png" alt="Demo de WormGear montada" width="480">
 
-El engrane por defecto, montado en una base con columnas y tapas que se bloquean con filamento. El sinfín y la rueda se imprimen de una pieza con sus ejes, y al girar el pomo gira la rueda. Las piezas, cómo se imprimen y cómo se monta están en la [demo](demo/README.md).
+El engrane por defecto, montado en una base con columnas y tapas. El sinfín y la rueda se imprimen de una pieza con sus ejes, y al girar el pomo gira la rueda. Las piezas, cómo se imprimen y cómo se monta están en la [demo](demo/README.md).
 
 ### Una pequeña historia
 
