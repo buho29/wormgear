@@ -16,6 +16,12 @@ The worm and the wheel are each printed **in one piece with their shafts**, whic
 
 ![Rear view](img/conjunto_atras.png)
 
+## 📷 Printed
+
+| | | |
+|---|---|---|
+| ![Printed demo, front](img/impresa_frente.jpg) | ![Printed demo, side](img/impresa_lado.jpg) | ![Printed demo, with the engraved ratio](img/impresa_relacion.jpg) |
+
 ## 🧩 Parts
 
 The STEP files in [`3d files/`](3d%20files/) are already in their printing orientation, with the bed at z = 0. They need no slicer supports.
@@ -25,7 +31,7 @@ The STEP files in [`3d files/`](3d%20files/) are already in their printing orien
 | [`base.step`](3d%20files/base.step) | 1 | Plate on the bed. |
 | [`tapa.step`](3d%20files/tapa.step) (cap) | 4 | As mounted. The four caps are identical. |
 | [`sinfin.step`](3d%20files/sinfin.step) (worm) | 1 | Standing, knob down. |
-| [`rueda.step`](3d%20files/rueda.step) (wheel) | 1 | Standing on the tip of the shaft on the recessed side. The file holds the wheel and its support, already in place. |
+| [`rueda.step`](3d%20files/rueda.step) (wheel) | 1 | Standing on the tip of the shaft on the recessed side. The file holds the wheel and its support, already in place. To remove the support, hold the wheel and pull the support off with pliers, without putting force on the shaft. |
 
 [`conjunto.step`](3d%20files/conjunto.step) is the assembled demo, without the support.
 
@@ -46,9 +52,12 @@ The wheel is printed standing on the tip of its lower shaft, so the wheel sits 2
 ## 🔧 Assembly
 
 1. Rest the wheel and worm shafts in the half housings of the columns. The double cone of each shaft drops into its seat.
-2. Slide each cap into its column from the top, with the tongues in the grooves, until it is all the way down.
+2. Slide each cap into its column from the top, with the tongues in the grooves, until it is all the way down, and fix it with a drop of glue (Loctite).
 
 The mating parts have 0.1 mm of clearance per side.
+
+- **Grease:** a little on the shaft "bearings" is recommended.
+- **If a shaft drags:** if the shaft stops turning smoothly once the cap is down, lightly sand the outer diameter of the shaft's double cone.
 
 ## 🛠️ The Fusion script
 
@@ -61,4 +70,4 @@ The mating parts have 0.1 mm of clearance per side.
 
 ## 💡 Note
 
-The trick of printing the wheel in one piece with its shaft comes from the video by **Iker Libano (KNIN Custom)** [*La Sorprendente Ingeniería Detrás de los Engranajes Impresos en 3D*](https://www.youtube.com/watch?v=5GPN3j80qZo&t=307s) (in Spanish).
+The trick of printing the wheel in one piece with its shaft comes from the video by **Iker Libano** ([KNIN Custom](https://www.youtube.com/@KNIN_Custom)) [*La Sorprendente Ingeniería Detrás de los Engranajes Impresos en 3D*](https://www.youtube.com/watch?v=5GPN3j80qZo&t=307s) (in Spanish).
