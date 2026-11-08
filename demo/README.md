@@ -25,7 +25,7 @@ Los STEP de [`3d files/`](3d%20files/) ya están en su postura de impresión, co
 | [`base.step`](3d%20files/base.step) | 1 | Con la placa en la cama. |
 | [`tapa.step`](3d%20files/tapa.step) | 4 | Como va montada. Las cuatro tapas son iguales. |
 | [`sinfin.step`](3d%20files/sinfin.step) | 1 | De pie, con el pomo abajo. |
-| [`rueda.step`](3d%20files/rueda.step) + [`soporte_rueda.step`](3d%20files/soporte_rueda.step) | 1 | De pie, sobre la punta del eje del lado del rebaje, con su soporte. Hay que cargar los dos archivos juntos, como un solo objeto: ya están en su sitio. |
+| [`rueda.step`](3d%20files/rueda.step) | 1 | De pie, sobre la punta del eje del lado del rebaje. El archivo lleva la rueda y su soporte, ya en su sitio. |
 
 [`conjunto.step`](3d%20files/conjunto.step) es la demo montada, sin el soporte.
 

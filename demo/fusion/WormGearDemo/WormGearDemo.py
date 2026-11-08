@@ -42,11 +42,13 @@ FIT = 0.1          # holgura por lado entre piezas impresas
 WALL = 3.2         # pared mínima
 H = 40.0           # altura del eje de la rueda (la rueda queda a 4 mm de la placa)
 PLATE_T = 12.0     # grosor de la placa
-# eje: cuello de NECK_D y "rodamiento" de dos conos de 45° (de NECK_D a BRG_D y vuelta a NECK_D) separados por
+# eje: cuello de NECK_D y "rodamiento" de dos conos de 45° (de NECK_D a BRG_SHAFT_D y vuelta a NECK_D) separados por
 # un cilindro de BRG_GAP. Los ejes no llevan caras planas: todos los cambios de Ø son conos de 45°.
 NECK_D = 6.0
 BRG_D = 10.0
 BRG_GAP = 1.0
+BRG_SHAFT_D = 9.9  # Ø del cilindro del rodamiento en el eje: 0.1 menos que BRG_D (el hueco sigue en BRG_D + 2·FIT);
+                   # los conos siguen a 45° y el cilindro se alarga lo que acortan
 TIP_L = 3.0        # punta que asoma por fuera del alojamiento: el cuello recto, con un chaflán de 0.5
 CHANNEL = 3.5      # tramo de cuello dentro del alojamiento, a cada lado de los conos (columna de 12 de grueso)
 HUB_D = 16.0       # base del cono de 45° que sale de la cara de la rueda
@@ -144,11 +146,12 @@ def wg_matrix():
 def bearing_profile(s0, sign):
     """Perfil del rodamiento a partir de s0 (cara interior del alojamiento), hacia fuera con signo sign:
     cuello, cono que abre, cilindro, cono que cierra y cuello. Devuelve [(s, r)] y el s de la cara exterior."""
-    rn, rb = NECK_D / 2, BRG_D / 2
+    rn, rb = NECK_D / 2, BRG_SHAFT_D / 2
+    dr = (BRG_D - BRG_SHAFT_D) / 2   # lo que se acorta cada cono
     s = [s0]
     for d in (CHANNEL, BRG_CONE, BRG_GAP, BRG_CONE, CHANNEL):
         s.append(s[-1] + sign * d)
-    return [(s[0], rn), (s[1], rn), (s[2], rb), (s[3], rb), (s[4], rn), (s[5], rn)], s[5]
+    return [(s[0], rn), (s[1], rn), (s[2] - sign * dr, rb), (s[3] + sign * dr, rb), (s[4], rn), (s[5], rn)], s[5]
 
 
 def shaft_profile(face_s, face_r, housing_s, sign, outer):

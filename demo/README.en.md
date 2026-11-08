@@ -25,7 +25,7 @@ The STEP files in [`3d files/`](3d%20files/) are already in their printing orien
 | [`base.step`](3d%20files/base.step) | 1 | Plate on the bed. |
 | [`tapa.step`](3d%20files/tapa.step) (cap) | 4 | As mounted. The four caps are identical. |
 | [`sinfin.step`](3d%20files/sinfin.step) (worm) | 1 | Standing, knob down. |
-| [`rueda.step`](3d%20files/rueda.step) + [`soporte_rueda.step`](3d%20files/soporte_rueda.step) (wheel + support) | 1 | Standing on the tip of the shaft on the recessed side, with its support. Load both files together as one object: they are already in place. |
+| [`rueda.step`](3d%20files/rueda.step) (wheel) | 1 | Standing on the tip of the shaft on the recessed side. The file holds the wheel and its support, already in place. |
 
 [`conjunto.step`](3d%20files/conjunto.step) is the assembled demo, without the support.
 
